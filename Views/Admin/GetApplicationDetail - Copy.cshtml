@@ -1,0 +1,121 @@
+﻿@model Models.Views.Auction.Application
+
+@{
+    ViewData["Title"] = "Application Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1 class="text-center">Application Detail</h1>
+        <div class="auction-block">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Category</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.SeriesCategory)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Series</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.Series)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Auction Number</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.SeriesNumber)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Reserved Price</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.ReservePrice)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">AIN</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.AIN)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Status</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.ApplicationStatus)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4"></label>
+                        <div class="input-holder">
+                            @if (Model.ApplicationStatusId == 1)
+                            {
+                                <form asp-action="ApproveApplication">
+                                    @Html.Hidden("applicationId", Model.Id)
+                                    <input type="submit" value="Approve" class="btn btn-sm btn-primary" />
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Status</th>
+                        <th>Dated</th>
+                        <th>Comments</th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model.ApplicationStatusHistory)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedOn)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Comments)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

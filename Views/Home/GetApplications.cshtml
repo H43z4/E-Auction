@@ -1,0 +1,175 @@
+﻿@model IEnumerable<Models.Views.Auction.Application>
+
+@{
+    ViewData["Title"] = "Bidding Applications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('.btnPSId').click(function (event) {
+
+                var elementId = event.target.id;
+
+                var data = {
+
+                    Id: parseInt($(this).data('id'))
+                };
+
+                $("#loader").toggle();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/GetPSId",
+                    contentType: "application/json; charset=utf-8",
+                    //data: data,
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.status) {
+                            //window.location.href = "GetApplications";
+                            $('#' + elementId).parent().html(response.psId);
+                        }
+                        else {
+                            swal("Error!", response.msg, "error");
+                        }
+                    },
+                    failure: function (response) {
+                        swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                    }
+                })
+                    .done(function () {
+
+                        $("#loader").toggle();
+                    });
+            });
+            
+        });
+
+
+    </script>
+}
+
+    <div class="content-area col-sm-9">
+    @if (TempData.Count > 0)
+    {
+        var newlySubmittedApps = TempData.SingleOrDefault(x => x.Key == "newlySubmittedApps").Value.ToString().Split(',');
+
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Success!</strong> New application(s) submitted against:
+            @foreach (var app in newlySubmittedApps)
+            {
+                <br />
+                var application = Model.SingleOrDefault(x => x.SeriesNumberId == Convert.ToInt32(app));
+
+                @application.AIN
+            }
+
+        </div>
+    }
+
+    <div class="detail-block">
+
+        <h1>Bidding Applications</h1>
+
+        @if (Model.Count() == 0)
+        {
+            <div class="alert alert-info">
+                <div class="text-center">
+                    <strong>NO APPLICATION SUBMITTED.</strong>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                Dear Citizen, your application for attractive registration mark has been SUCCESSFULLY sent to Motor Registration Authority.
+                <p>
+                    You are requested to pay participation fee of Rs 100 against your PSID.
+                </p>
+                <p>
+                    The payment receipt of participation fee along with pay order in the name of MRA of District you desire to visit may be submitted in MRA office within 02 days after closing date of registration.
+                </p>
+                <p>
+                    Once, your application is approved by MRA you can participate in the E-Auction proceedings.
+                </p>
+                Wish you best of luck
+            </div>
+
+            <div class="auction-block">
+                @foreach (var item in Model)
+                {
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="background-color:#c1d7cb;">
+                            <div class="row">
+                                <div class="text-center">
+                                    AIN: <strong>@Html.DisplayFor(modelItem => item.AIN)</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <table class="table">
+                                        <tr><th>Status</th><td>@Html.DisplayFor(modelItem => item.ApplicationStatus)</td></tr>
+                                        <tr><th>Category</th><td>@Html.DisplayFor(modelItem => item.SeriesCategory)</td></tr>
+                                        <tr><th>Series</th><td>@Html.DisplayFor(modelItem => item.Series)</td></tr>
+                                        <tr><th>Registration Mark</th><td>@Html.DisplayFor(modelItem => item.SeriesNumber)</td></tr>
+                                        <tr><th>Reserve Price</th><td>@Html.DisplayFor(modelItem => item.ReservePrice)</td></tr>
+                                        <tr><th>Chassis Number</th><td>@Html.DisplayFor(modelItem => item.ChasisNumber)</td></tr>
+                                        <tr>
+                                            <th>PSID</th>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(item.PSId))
+                                                {
+                                                    if (item.ApplicationStatusId == 1)
+                                                    {
+                                                        @*<a class="btn btn-sm btn-primary" asp-action="GetPSId" asp-route-applicationId="@item.Id">Refresh</a>*@
+                                                        @*<a href="" id="btnPSId" class="btn btn-sm btn-primary" data-id="@item.Id">Refresh</a>*@
+                                                        @*<button class="btn btn-sm btn-primary btnPSId" data-id="@item.Id">Refresh</button>*@
+
+                                                        var elementId = "btnPSId" + item.Id;
+                                                        <button id="@elementId" class="btn btn-sm btn-primary btnPSId" data-id="@item.Id">Refresh</button>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @Html.DisplayFor(modelItem => item.PSId)
+                                                    <div>Expiry: @item.RegEndDateTime</div>
+                                                }
+                                            </td>
+                                        </tr>
+
+
+
+                                        @*@if (string.IsNullOrEmpty(item.PSId))
+                                            {
+                                                if (item.ApplicationStatusId == 1)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <a class="btn btn-sm btn-primary" asp-action="GetChallan" asp-route-applicationId="@item.Id">Download Challan Form</a>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                }
+                                            }*@
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>

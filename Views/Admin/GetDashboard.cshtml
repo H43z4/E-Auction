@@ -1,0 +1,182 @@
+﻿
+@model Models.Views.Dashboard.Dashboard
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Dashboard </h1>
+        <br />
+
+        @using (Html.BeginForm("GetDashboard", "Admin", FormMethod.Post))
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4">Category</label>
+                            <div class="col-md-8">
+                                <select name="CateogryList" class="form-control">
+                                    <option value="0">All</option>
+                                    @if (ViewBag.CatID == "1")
+                                    {
+                                        <option value="1" selected="selected">Motor Car / موٹر کار</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Motor Car / موٹر کار</option>
+                                    }
+
+                                    @if (ViewBag.CatID == "3")
+                                    {
+                                        <option value="3" selected="selected">Motor Cycle / موٹر سائیکل</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="3">Motor Cycle / موٹر سائیکل</option>
+                                    }
+                                    @if (ViewBag.CatID == "4")
+                                    {
+                                        <option value="4" selected="selected">Commercial / کمرشل</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="4">Commercial / کمرشل</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="submit" value="Search" class="btn btn-success btn-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <br />
+        <div class="auction-block">
+            <div class="col-md-2 text-center alert btn-primary col-md-offset-1">
+                <h5>Total Applications</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalApplications</p>
+            </div>
+            <div class="col-md-2 text-center alert btn-danger">
+                <h5> Approved Applications</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalApprovedApplications</p>
+            </div>
+            <div class="col-md-2 text-center alert btn-warning">
+                <h5>Total Active Series</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalActiveSeries</p>
+            </div>
+            <div class="col-md-2 text-center alert btn-success">
+                <h5>Approved Active Series</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalApprovedApplicationAgainstActiveSeries</p>
+            </div>
+            <div class="col-md-2 text-center alert btn-info">
+                <h5> Total Revenue </h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalRevenuSeriesWise</p>
+            </div>
+            <br />
+            <div class="col-md-6">
+                <h3>Revenue </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Reg Number</th>
+                            <th>Bid Amount</th>
+                        </tr>
+                        @foreach (var item in Model.TotalRevenueList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.RegNumber
+                                </td>
+                                <td>
+                                    Rs/- @item.TotalRevenuSeriesWise.ToString("00,00")
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3>Application Against Series </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Series</th>
+                            <th>Total Application Against Series</th>
+                        </tr>
+                        @foreach (var item in Model.totalApplicationAgainstSeries)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Series
+                                </td>
+                                <td>
+                                    @item.SeriesCount
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <br />
+            <br />
+            <div class="col-md-6">
+                <h3>Application Against Numbers </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Series</th>
+                            <th>Auction</th>
+                            <th>Total Application Against Numbers</th>
+                        </tr>
+                        @foreach (var item in Model.totalApplicationAgainstNumbers)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Series
+                                </td>
+                                <td>
+                                    @item.AuctionNumber
+                                </td>
+                                <td>
+                                    @item.NumbersCount
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3>Active Series </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Active Series</th>
+                            <th>Category</th>
+                        </tr>
+                        @foreach (var item in Model.SeriesCategoryList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.ActiveSeries
+                                </td>
+                                <td>
+                                    @item.Category
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

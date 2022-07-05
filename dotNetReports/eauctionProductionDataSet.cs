@@ -1,0 +1,7 @@
+﻿namespace dotNetReports
+{
+}
+
+namespace dotNetReports
+{
+}

@@ -1,0 +1,108 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Auction.Winners>
+
+@{ 
+    var groupedBidLogs = Model.ListOfItems.GroupBy(x => new { x.SeriesCategory, x.Series });
+}
+
+<div class="row">
+    @foreach (var group in groupedBidLogs)
+    {
+        <br />
+        <div class="table-responsive">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#Motorcycle" style="color:green;">@($"{group.Key.SeriesCategory} [{group.Key.Series}]")</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="Motorcycle" class="tab-pane fade in active">
+                    <br />
+                    <table class="registration-table add other">
+                        <tr>
+                            <th></th>
+                            <th>Category</th>
+                            <th>Series</th>
+                            <th>Series Number</th>
+                            <th>Reserve Price (PKR)</th>
+                            <th>Highest Bid (PKR)</th>
+                            <th>Winner AIN</th>
+                            <th>Owner Name</th>
+                        </tr>
+                        @{
+                            int rowNum = 0;
+                        }
+                        @foreach (var item in group)
+                        {
+                            <tr>
+                                <td>@{ rowNum++; } @rowNum</td>
+                                <td>
+                                    @item.SeriesCategory
+                                </td>
+                                <td>
+                                    @item.Series
+                                </td>
+                                <td>
+                                    @item.SeriesNumber
+                                </td>
+                                <td>
+                                    @item.ReservePrice.ToString("N0")
+                                </td>
+                                <td>
+                                    @item.HighestBiddingPrice.ToString("N0")
+                                </td>
+                                <td>
+                                    @item.WinnerAIN
+                                </td>
+                                <td>
+                                    @item.OwnerName
+                                </td>
+                            </tr>
+                        }
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+<div class="text-center">
+    <div class="col-md-12">
+
+        @if (Model.Pager.EndPage > 1)
+        {
+            var seriesId = @Model.ListOfItems.FirstOrDefault().SeriesId;
+
+            <ul class="pagination pagination-sm">
+
+                @if (Model.Pager.CurrentPage > 1)
+                {
+                    <li>
+                        <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="1">First</a>
+                    </li>
+                    <li>
+                        <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(Model.Pager.CurrentPage - 1)">Previous</a>
+                    </li>
+                }
+
+                @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                {
+                    <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+
+                        <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(page)">@(page)</a>
+                    </li>
+                }
+
+                @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                    <li>
+                        <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(Model.Pager.CurrentPage + 1)">Next</a>
+                    </li>
+                    <li>
+                        <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(Model.Pager.TotalPages)">Last</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+

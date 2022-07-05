@@ -1,0 +1,127 @@
+﻿@model Models.Views.Auction.Series
+
+@{
+    ViewData["Title"] = "Series Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Series Detail</h1>
+        <div class="auction-block">
+            <form asp-action="SaveSeries">
+                <input type="hidden" asp-for="Id" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Category</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.CategoryName)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Series</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.SeriesName)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Status</label>
+                            <select class="col-md-6" asp-for="SeriesStatusId" asp-items="@ViewBag.SeriesStatusSelectList"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Reg Start Date Time</label>
+                            <div class="input-holder">
+                                <input asp-for="RegStartDateTime" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Reg End Date Time</label>
+                            <div class="input-holder">
+                                <input asp-for="RegEndDateTime" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Auction Start Date Time</label>
+                            <div class="input-holder">
+                                <input asp-for="AuctionStartDateTime" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Auction End Date Time</label>
+                            <div class="input-holder">
+                                <input asp-for="AuctionEndDateTime" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <div class="col-md-4">
+                                <input type="submit" class="btn-login" value="Save" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <br />
+
+            <div class="row">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Status</th>
+                        <th>Dated</th>
+                        <th>Comments</th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model.SeriesStatusHistory)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SeriesStatus)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedOn)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Comments)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

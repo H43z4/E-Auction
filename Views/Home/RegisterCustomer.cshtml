@@ -1,0 +1,142 @@
+﻿@model Models.Domain.Auction.Customer
+
+@{
+    ViewData["Title"] = "Default";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/lib/jquery.inputmask 5.0.2/jquery.inputmask.min.js"></script>
+<script src="~/lib/jquery.inputmask 5.0.2/bindings/inputmask.binding.js"></script>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var selectedNumber = localStorage.getItem('selectedNumber');
+
+            if (selectedNumber != undefined) {
+
+                $('#seriesDetailId').prop('value', selectedNumber);
+            }
+            else {
+                window.location.href = "Home/Series.html";
+            }
+
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1 class="text-center">Applicant Personal Information</h1>
+        <div class="login-form">
+            <div class="form-holder">
+                <form asp-action="RegisterCustomerAndApply">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="field-holder">
+                        <div class="alert-danger">
+                            <Label ID="lblErrormsg" Text=""></Label>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="seriesDetailId" name="seriesDetailId" />
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="field-holder">
+                                <label for="one">Applicant Name</label>
+                                <div class="input-holder">
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="field-holder">
+                                <label for="two">S/O , D/O Name</label>
+                                <div class="input-holder">
+                                    <input asp-for="FatherHusbandName" class="form-control" />
+                                    <span asp-validation-for="FatherHusbandName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="field-holder">
+                                <label for="three">CNIC</label>
+                                <div class="input-holder">
+                                    <input asp-for="CNIC" class="form-control" data-inputmask="'mask': '99999-9999999-9'" />
+                                    <span asp-validation-for="CNIC" class="text-danger"></span>
+                                    <span class="text-center">OR</span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="field-holder">
+                                <label for="three">NTN</label>
+                                <div style="display:inline-block" class="input-holder">
+                                    <input asp-for="NTN" class="form-control" />
+                                    <span asp-validation-for="NTN" class="text-danger"></span>
+                                </div>
+                                <span class="text-center">OR</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+
+                            <div class="field-holder">
+                                <label for="three">Chasis Number</label>
+                                <div class="input-holder">
+                                    <input asp-for="ChasisNumber" class="form-control" />
+                                    <span asp-validation-for="ChasisNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="field-holder">
+                                <label style="float:none !important" for="two">Mobile Number</label>
+                                <div class="input-holder">
+                                    <input asp-for="Phone" class="form-control" data-inputmask="'mask': '(0399)-999-9999'" />
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="field-holder">
+                                <label for="two">Email</label>
+                                <div class="input-holder">
+                                    <input asp-for="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field-holder">
+                        <label for="six">Address</label>
+                        <div class="input-holder">
+                            <textarea asp-for="Address" class="form-control"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="buttons-holder">
+                        <input type="submit" ID="btnSubmit" class="btn-login" Text="Next" />
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

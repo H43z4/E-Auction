@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Models.Views.Notification.Notification>
+
+@{
+    ViewData["Title"] = "Notifications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Notifications</h1>
+        <br />
+        <a class="btn btn-sm btn-primary" asp-action="GetNotificationDetail" asp-route-notificationId="0">Create New</a>
+        <div class="auction-block">
+        <br />
+            <div class="table-responsive">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Heading</th>
+                        <th>Content</th>
+                        <th>Data</th>
+                        <th>Dated</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                        @{
+                            int rowNum = 0;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@{ rowNum++; } @rowNum</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Heading)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Content)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Data)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NotificationStatus)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Details", "GetNotificationDetail", new { notificationId = item.Id }, htmlAttributes: new { @class = "btn-select" })
+                                </td>
+                            </tr>
+                        }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

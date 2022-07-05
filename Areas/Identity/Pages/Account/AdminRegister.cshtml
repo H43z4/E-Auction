@@ -1,0 +1,128 @@
+﻿@page
+@model AdminRegisterModel
+@{
+    ViewData["Title"] = "Register User";
+}
+
+<style type="text/css">
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    a:disabled {
+        background: #dddddd;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script src="~/lib/jquery.inputmask 5.0.2/jquery.inputmask.min.js"></script>
+    <script src="~/lib/jquery.inputmask 5.0.2/bindings/inputmask.binding.js"></script>
+
+    <script type="text/javascript">
+
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+
+            if (charCode >= 65 && charCode <= 90 || charCode >= 97 && charCode <= 122 || charCode == 32)
+                return true;
+
+            return false;
+        }
+
+        $(document).ready(function () {
+
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9" id="signupDiv">
+    <div class="detail-block">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <div class="row">
+            <div class="container">
+                <div class="col-sm-8 alert-success">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @if (ViewData["Status"] != null)
+                    {
+                        if ((bool)ViewData["Status"] == true)
+                        {
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <strong>User registered successfully.</strong>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn-login" onclick="location.replace('/Identity/Account/AdminRegister');">Refresh</button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="login-form">
+                <div class="form-holder col-md-8">
+                    <form method="post">
+                        <div class="form-group">
+                            <label asp-for="Input.Name"></label>
+                            <input asp-for="Input.Name" class="form-control" onkeypress="return isNumberKey(this, event);" />
+                            <span asp-validation-for="Input.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.CNIC"></label>
+                            <input asp-for="Input.CNIC" class="form-control" data-inputmask="'mask': '99999-9999999-9'" />
+                            <span asp-validation-for="Input.CNIC" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.NTN"></label>
+                            <input asp-for="Input.NTN" class="form-control" />
+                            <span asp-validation-for="Input.NTN" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Company"></label>
+                            <input asp-for="Input.Company" class="form-control" />
+                            <span asp-validation-for="Input.Company" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.PhoneNumber"></label>
+                            <input asp-for="Input.PhoneNumber" class="form-control" data-inputmask="'mask': '999999999999999'" />
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Email"></label>
+                            <input asp-for="Input.Email" class="form-control" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Password"></label>
+                            <input asp-for="Input.Password" class="form-control" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.ConfirmPassword"></label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        <p></p>
+                        <div class="agree-footer">
+                            <div class="checkbox-holder">
+                                <div class="checkbox">
+                                </div>
+                            </div>
+                            <div class="button-holder">
+                                <button id="btnNext" class="btn-next">Register</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

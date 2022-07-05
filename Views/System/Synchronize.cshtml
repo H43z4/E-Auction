@@ -1,0 +1,117 @@
+﻿@model IEnumerable<Models.Views.Auction.Series>
+
+@{
+    ViewData["Title"] = "Bidding Applications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('.btn-select').click(function (event) {
+
+                event.preventDefault();
+
+                var url = $(this).prop('href');
+
+                callAjaxMethod($(this), url);
+            });
+
+            function callAjaxMethod(btnDownload, url) {
+
+                swal({
+                    title: "Are You Sure?",
+                    text: "Are you sure to download this series Nos.?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true,
+                },
+
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            //var data = {
+                            //    seriesNumberId: selectedNumber,
+                            //};
+
+                            $.ajax({
+                                type: "GET",
+                                url: url,
+                                success: function (response) {
+                                    if (response.status) {
+
+                                        btnDownload.toggle();
+                                        swal("Success!", "Download complete.", "success");
+                                    }
+                                },
+                                failure: function (response) {
+                                    swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                                }
+                            });
+                        }
+                        else {
+                            swal("Cancelled", "Your imaginary file is safe :)", "error");
+                        }
+                    });
+
+            }
+
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Synchronize</h1>
+        <div class="auction-block">
+            <div class="table-responsive">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Category</th>
+                        <th>Series</th>
+                        <th>Registration Start Date/Time</th>
+                        <th>Registration End Date/Time</th>
+                        <th class="one"></th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CategoryName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SeriesName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RegStartDateTime)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RegEndDateTime)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Download Nos.", "DownloadNumbers", new { seriesCategoryId = item.CategoryId, seriesId = item.Id, series = item.SeriesName }, htmlAttributes: new { @class = "btn-select" })
+                            </td>
+                        </tr>
+                    }
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Models.Views.Auction.Winners>
+
+@{
+    ViewData["Title"] = "Winners";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Live Bidding</h1>
+        <br />
+        <div class="auction-block">
+            <table class="registration-table add other table table-responsive">
+                <tr>
+                    <th></th>
+                    <th>Category</th>
+                    <th>Series</th>
+                    <th>Registration Mark</th>
+                    <th>Reserve Price</th>
+                    <th>Highest Bidding Price</th>
+                    <th>Winner AIN</th>
+                    <th>Chassis Number</th>
+                </tr>
+                @{
+                    int rowNum = 0;
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@{ rowNum++; } @rowNum</td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SeriesCategory)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Series)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SeriesNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ReservePrice)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HighestBiddingPrice)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.WinnerAIN)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ChasisNumber)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>

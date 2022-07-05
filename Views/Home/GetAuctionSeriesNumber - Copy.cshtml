@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Models.Views.Auction.SeriesNumber>
+
+@{
+    ViewData["Title"] = "Auction Series Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var selectedNumber = localStorage.getItem('selectedNumber');
+
+            if (selectedNumber != undefined) {
+
+                var ckbox = $('#ckb_' + selectedNumber);
+
+                if (ckbox.length) { // selected Number is present in the current list shown
+
+                    ckbox.prop('checked', true);
+                    $('#seriesNumberId').prop('value', selectedNumber);
+                }
+                else {
+                    localStorage.removeItem('selectedNumber');
+                }
+            }
+
+            $('input:checkbox').click(function () {
+
+                var selectedNumber = $('input:checkbox:checked:first').prop('value');
+
+                if (selectedNumber === undefined) {
+
+                    localStorage.removeItem('selectedNumber');
+                }
+                else {
+
+                    $('#seriesNumberId').prop('value', selectedNumber);
+                    localStorage.setItem('selectedNumber', selectedNumber);
+                }
+            })
+
+            $('#btnNext').click(function (event) {
+
+                event.preventDefault();
+
+                var selectedNumber = localStorage.getItem('selectedNumber');
+
+                if (!selectedNumber) {
+
+                    swal("Error!", "Select an auction No.", "error");
+                    return;
+                }
+
+                callAjaxMethod();
+            });
+
+            function callAjaxMethod() {
+
+                swal({
+                    title: "Are You Sure?",
+                    text: "Are you sure to apply for this No.?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true,
+                },
+
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            var selectedNumber = localStorage.getItem('selectedNumber');
+
+                            var data = {
+                                seriesNumberId: selectedNumber,
+                            };
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/Home/SaveApplication",
+                                //contentType: "application/json; charset=utf-8",
+                                data: data,
+                                dataType: "json",
+                                success: function (response) {
+                                    if (response.status) {
+
+                                        swal("Success!", "Application submitted.", "success");
+                                    }
+                                    else {
+                                        swal("Error!", response.msg, "error");
+                                    }
+                                },
+                                failure: function (response) {
+                                    swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                                }
+                            });
+                        }
+                        else {
+                            swal("Cancelled", "Your imaginary file is safe :)", "error");
+                        }
+                    });
+
+            }
+
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1> @ViewBag.series.CategoryName [ @ViewBag.series.SeriesName ] </h1>
+        <span class="text">Select Registration Mark Of Choice</span>
+        <div class="table-holder">
+            <div class="rgDataDiv" style="overflow-y: scroll;height: 300px;">
+
+                <table class="registration-table">
+                    <tr>
+                        <th width="50">Select</th>
+                        <th width="50">Registration Mark</th>
+                        <th width="300">Reserve Price</th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.CheckBox("selectedNumber", false, new { id = "ckb_" + item.Id, value = item.Id })
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AuctionNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReservePrice)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+        <div class="login-form add">
+            <div class="buttons-holder">
+                <a id="btnBack" class="btn-login" asp-area="" asp-controller="Home" asp-action="GetAuctionSeries">Back</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button class="btn-login" id="btnNext">Apply</button>
+                }
+                else
+                {
+                    <a class="btn-login" asp-area="Identity" asp-page="/Account/Login">Login to Apply</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,288 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Auction.SeriesNumber>
+
+@{
+    ViewData["Title"] = "Auction Series Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            function fetch(auctionNumber, seriesId, pageNumber) {
+
+                $("#loader").toggle();
+
+                $.get("@Url.Action("GetSeriesNumber", "Home")",
+                    { AuctionNumber: auctionNumber, seriesId: seriesId, pageNumber: pageNumber },
+                    function (response) {
+
+                        $("#seriesNumbers").html(response);
+                    }//,"json"
+                )
+                .fail(function (error) {
+				    console.log(error);
+                })
+                .done(function () {
+                    $("#loader").toggle();
+                    BindEvents();
+                    ResetCheckbox();
+                });
+            }
+
+            function ResetCheckbox() {
+
+                //uncheck all
+                $("#seriesNumbers tbody tr").find("input:checkbox").each(function () {
+
+                    $(this).prop('checked', false);
+                });
+
+                $("#selectedSeriesNumbers tbody tr").each(function () {
+
+                    var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+
+                    $("#seriesNumbers tbody tr td input[name=selectedNumber][value=" + seriesNumberId + "]")
+                        .eq(0)
+                        .prop('checked', true);
+                });
+            }
+
+            function BindEvents() {
+
+                $("a.page").click(function (e) {
+
+                    e.preventDefault();
+
+                    var seriesId = $(this).data("seriesid");
+                    var pageNumber = $(this).data("pagenumber");
+
+                    fetch(null, seriesId, pageNumber);
+                });
+
+                $("a.removeselectedRow").click(function (e) {
+
+                    e.preventDefault();
+
+                    $(this).closest("tr").remove();
+
+                    ResetCheckbox();
+                });
+
+                $("input:checkbox").change(function () {
+
+                    $("#selectedSeriesNumbers tbody tr").each(function () {
+
+                        var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+
+                        var unCheckedRows = $('#seriesNumbers tr').filter(':has(:checkbox:not(:checked))').find("input[name = seriesNumberId][value = " + seriesNumberId + "]");
+
+                        if (unCheckedRows.length) {
+
+                            $(this).remove();
+                        }
+                    });
+
+                    $('#seriesNumbers tr').filter(':has(:checkbox:checked)').each(function () {
+
+                        var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+
+                        var alreadySelectedRow = $("#selectedSeriesNumbers tbody tr td input[name=seriesNumberId][value=" + seriesNumberId + "]");
+
+                        if (!alreadySelectedRow.length) {
+
+                            // this = tr
+                            $tr = $(this).clone(false);
+
+                            $tr.find("td:nth-of-type(4)").find("input").css("display", "block");
+                            $tr.find("td:nth-of-type(5)").find("input").css("display", "block");
+                            $tr.find("td:first-child").remove();
+
+                            $tr.append("<td><a href='' class='removeselectedRow'>Remove</a></td>")
+
+                            $('#selectedSeriesNumbers tbody').append($tr);
+
+                            BindEvents();
+                        }
+                    });
+                });
+            }
+
+            BindEvents();
+
+            $('#filter').keyup(function () {
+
+                var val = $(this).val().replace(/[^0-9]/g, '');
+
+                $(this).val(val);
+
+                var srnum = $("#seriesNumbers tbody tr").eq(0).children().eq(1).text();
+
+                var maxLength = $.trim(srnum).length;
+
+                if (val.length > 0 && val.length < maxLength) {
+
+                    lastSearchValue = val;
+
+                    return;
+                }
+
+                var seriesId = $(this).data("seriesid");
+
+                fetch(val, seriesId, 1);
+            });
+
+            $('#btnNext').click(function (event) {
+
+                event.preventDefault();
+
+                var data = new Array();
+
+                var isDataValid = true;
+
+                $("#selectedSeriesNumbers tbody tr").each(function () {
+
+                    var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+                    var chasisNumber = $(this).find('input[name=chasisNumber]').val();
+                    var ownerName = $(this).find('input[name=ownerName]').val();
+
+                    if (!chasisNumber.length || !ownerName.length) {    //string.length
+
+                        isDataValid = false;
+                        return false;
+                    }
+
+                    data.push({
+
+                        id: parseInt(seriesNumberId),
+                        chasisNumber: chasisNumber,
+                        ownerName: ownerName
+                    });
+                });
+
+                if (!isDataValid) {
+
+                    swal("Error!", "Chassis Number(s) and owner name(s) required.", "error");
+                    return;
+                }
+
+
+                if (!data.length) {
+
+                    swal("Error!", "Select an auction No.", "error");
+                    return;
+                }
+
+
+                callAjaxMethod(data);
+            });
+
+            function callAjaxMethod(data) {
+
+                swal({
+                    title: "Are You Sure?",
+                    text: "Are you sure to apply for the selected Registration Mark(s) of Choice?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true,
+                },
+
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            $("#loader").toggle();
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/Home/SaveApplications",
+                                contentType: "application/json; charset=utf-8",
+                                //data: data,
+                                data: JSON.stringify(data),
+                                dataType: "json",
+                                success: function (response) {
+                                    if (response.status) {
+
+                                        window.location.href = "GetApplications";
+                                    }
+                                    else {
+                                        swal("Error!", response.msg, "error");
+                                    }
+                                },
+                                failure: function (response) {
+                                    swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                                }
+                            })
+                                .done(function () {
+
+                                    $("#loader").toggle();
+                                });
+                        }
+                        else {
+                            swal("Cancelled", "Your imaginary file is safe :)", "error");
+                        }
+                    });
+
+            }
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9" id="selectedSeriesNumbersDiv">
+    <div class="detail-block">
+        <h1> @ViewBag.series?.CategoryName [ @ViewBag.series?.SeriesName ] </h1>
+        <span class="text">Select Registration Mark Of Choice</span>
+        <div class="auction-block">
+
+            <div class="col-md-12">
+                <div class="col-md-4 pull-right">
+                    <input type="text" id="filter" class="form-control" placeholder="Search Registration Mark" data-seriesid="@Model.ListOfItems.FirstOrDefault().SeriesId" />
+                    <br />
+                </div>
+            </div>
+
+            <div class="col-md-12" id="seriesNumbers">
+                <partial name="_SeriesNumber" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-3"></div>
+<div class="content-area col-md-9">
+    <div class="detail-block">
+        <h1 class="text-center">Selected Registration Mark of Choice</h1>
+        <p class="text-center">Please, enter the chassis No. and owner name of the vehicle for which you want to get the registration mark.</p>
+        <div class="auction-block">
+            <table class="registration-table add" id="selectedSeriesNumbers">
+                <thead>
+                    <tr>
+                        <th>Registration Mark</th>
+                        <th>Reserve Price</th>
+                        <th>Chassis Number</th>
+                        <th>Vehicle Owner Name</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <br />
+        <div class="login-form add">
+            <div class="buttons-holder">
+                <a id="btnBack" class="btn-login" asp-area="" asp-controller="Home" asp-action="GetAuctionSeries">Back</a>
+                <button class="btn-login" id="btnNext">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>

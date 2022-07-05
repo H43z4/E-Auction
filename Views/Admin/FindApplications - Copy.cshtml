@@ -1,0 +1,216 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Auction.Application>
+
+@{
+    ViewData["Title"] = "Customer Applications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    option.active {
+        display: inline-block;
+    }
+
+    option.inactive {
+        display: none;
+    }
+</style>
+
+@section Scripts
+{
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#SeriesId option').addClass("inactive");
+
+            $('#SeriesCategoryId').change(function () {
+
+                $('#SeriesId option').removeClass("inactive");
+                $('#SeriesId option').removeClass("active");
+                $('#SeriesId option').addClass("inactive");
+
+                var selectedCatId = $(this).val();
+
+                if (selectedCatId == "0") {
+
+                    $('#SeriesId option').removeClass("inactive");
+                    $('#SeriesId option').addClass("active");
+
+                }
+                else {
+
+                    var seriesopts = $('#SeriesId option');
+
+                    $.each(seriesopts, function (i, j) {
+
+                        var catid = $(this).data('catid');
+
+                        if ($(this).data('catid') == selectedCatId) {
+
+                            $(this).removeClass("inactive");
+                            $(this).addClass("active");
+                        }
+                    });
+                }
+
+                $('#SeriesId option.active').eq(0).prop('selected', true);
+            });
+
+            BindEvents();
+
+            $("input[name=searchBtn]").click(function () {
+
+                fetch();
+            });
+
+            function fetch() {
+
+                $("#loader").toggle();
+
+                $.ajax({
+                    url: "/Admin/FindApplications",
+                    data: {
+                        ApplicationStatusId: $("#applicationStatusId").val(),
+                        AIN: $("#AIN").val(),
+                        PageNumber: $("#Pager_CurrentPage").val(),
+                        PageSize: $("#Pager_PageSize").val(),
+                        SeriesCategoryId: $("#SeriesCategoryId").val(),
+                        SeriesId: $("#SeriesId").val(),
+                        SeriesNumber: $("#SeriesNumber").val()
+                    },
+                    success: function (response) {
+                        $("div.table-responsive").html(response);
+                    },
+                    failure: function (response) {
+                        swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                    }
+                })
+                    .done(function () {
+                        $("#loader").toggle();
+
+                        BindEvents();
+                    });
+            }
+
+            function BindEvents() {
+
+                $("#Pager_CurrentPage").on("change", function () {
+
+                    fetch();
+                });
+
+                $("#Pager_PageSize").on("change", function () {
+
+                    fetch();
+                });
+            }
+        });
+    </script>
+}
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Customer Applications</h1>
+        <br />
+        <div class="panel-group">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-3 push-right">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse1">Search</a>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse in">
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="col-md-3 text-right">Category</label>
+                                <div class="col-md-9">
+                                    <select id="SeriesCategoryId" asp-items="ViewBag.SeriesCategory">
+                                        <option value="0">All Categories</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 text-right">Series</label>
+                                <div class="col-md-9">
+                                    @*<select id="SeriesId" asp-items="ViewBag.Series">
+                    <option value="0" data-catid="">All Series</option>
+                </select>*@
+                                    <select id="SeriesId">
+                                        <option value="0" data-catid="0">All Series</option>
+
+                                        @foreach (var series in (List<Models.Views.Auction.Series>)ViewBag.Series)
+                                        {
+                                            <option value="@series.Id" data-catid="@series.CategoryId">@series.SeriesName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-3 text-right">Registration Mark</label>
+                                    <div class="col-md-9">
+                                        <input type="text" id="SeriesNumber" name="SeriesNumber" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-3 text-right">Status</label>
+                                    <div class="col-md-9">
+                                        <select id="applicationStatusId" asp-items="ViewBag.ApplicationStatus">
+                                            <option value="0">Any</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-3 text-right">AIN</label>
+                                    <div class="col-md-9">
+                                        <input type="text" id="AIN" name="AIN" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-4">
+                                        <br />
+                                        <input type="button" class="btn btn-sm btn-primary" name="searchBtn" value="Search" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                    </div>
+                    <div class="panel-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-3"></div>
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <div class="auction-block">
+            <div class="table-responsive">
+                <partial name="_Applications" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+﻿@model IEnumerable<Models.Views.Auction.SeriesNumber>
+
+@{
+    ViewData["Title"] = "Auction Series Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#btnNext').click(function (event) {
+
+                event.preventDefault();
+
+                var checkedVals = $('input:checkbox:checked').map(function () {
+                    return this.value;
+                }).get();
+
+                if (!checkedVals.length) {
+
+                    swal("Error!", "Select an auction No.", "error");
+                    return;
+                }
+
+
+                callAjaxMethod(checkedVals);
+            });
+
+            function callAjaxMethod(checkedVals) {
+
+                swal({
+                    title: "Are You Sure?",
+                    text: "Are you sure to apply for this No.?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true,
+                },
+
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            var data = {
+                                seriesNumberIdCSVs: checkedVals.join(","),
+                            };
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/Home/SaveApplications",
+                                //contentType: "application/json; charset=utf-8",
+                                data: data,
+                                dataType: "json",
+                                success: function (response) {
+                                    if (response.status) {
+
+                                        window.location.href = "GetApplications";
+                                    }
+                                    else {
+                                        swal("Error!", response.msg, "error");
+                                    }
+                                },
+                                failure: function (response) {
+                                    swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                                }
+                            });
+                        }
+                        else {
+                            swal("Cancelled", "Your imaginary file is safe :)", "error");
+                        }
+                    });
+
+            }
+
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1> @ViewBag.series.CategoryName [ @ViewBag.series.SeriesName ] </h1>
+        <span class="text">Select Registration Mark Of Choice</span>
+        <div class="table-holder">
+            <div class="rgDataDiv" style="overflow-y: scroll;height: 300px;">
+
+                <table class="registration-table">
+                    <tr>
+                        <th width="50">Select</th>
+                        <th width="50">Registration Mark</th>
+                        <th width="300">Reserve Price</th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.CheckBox("selectedNumber", false, new { id = "ckb_" + item.Id, value = item.Id })
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AuctionNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReservePrice)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+        <div class="login-form add">
+            <div class="buttons-holder">
+                <a id="btnBack" class="btn-login" asp-area="" asp-controller="Home" asp-action="GetAuctionSeries">Back</a>
+                <button class="btn-login" id="btnNext">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+

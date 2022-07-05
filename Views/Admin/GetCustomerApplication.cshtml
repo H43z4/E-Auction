@@ -1,0 +1,96 @@
+﻿@model Models.Views.Auction.CustomerApplication
+
+@{
+    ViewData["Title"] = "Customer's Applications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*@section Scripts {
+
+    <script src="~/lib/microsoft.jquery.unobtrusive.ajax/jquery.unobtrusive-ajax.min.js"></script>
+
+    <script>
+        completed = function (xhr) {
+            alert(`Hi ${xhr.responseText}!`);
+        };
+    </script>
+}*@
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1 class="text-center">Customer</h1>
+        <div class="auction-block">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="field-holder">
+                        <label for="three">Name</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.Customer.Name)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="field-holder">
+                        <label for="three">Father/ Husband Name</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.Customer.FatherHusbandName)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Bidding Applications</h1>
+        <div class="auction-block">
+            <div class="table-responsive">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Category</th>
+                        <th>Series</th>
+                        <th>Series Number</th>
+                        <th>Reserve Price</th>
+                        <th>AIN</th>
+                        <th>Application Status</th>
+                        <th></th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model.Applications)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SeriesCategory)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Series)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SeriesNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReservePrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AIN)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Details", "GetApplicationDetail", new { applicationId = item.Id }, htmlAttributes: new { @class = "btn-select" })
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Models.Views.Auction.Winners>
+
+    <div class="col-sm-12 alert-success">
+        @if (Model.Count() > 0)
+        {
+            <div class="col-md-12">
+                <h1>@Model.FirstOrDefault().SeriesCategory [@Model.FirstOrDefault()?.Series]</h1>
+            </div>
+            <div class="col-md-6">
+                <form asp-action="ApproveWinnersList">
+                    <input type="hidden" name="seriesId" value="@ViewBag.SeriesId" />
+                    <input type="submit" class="btn btn-sm btn-primary" value="Approve Winners List"  />
+                </form>
+            </div>
+        }
+    </div>
+
+    <table class="registration-table add other">
+        <tr>
+            <th></th>
+            <th>Category</th>
+            <th>Series</th>
+            <th>Series Number</th>
+            <th>Reserve Price (PKR)</th>
+            <th>Highest Bid (PKR)</th>
+            <th>Winner AIN</th>
+            <th>Owner Name</th>
+        </tr>
+        @{
+            int rowNum = 0;
+        }
+        @foreach (var item in Model)
+        {
+            @*<tr>
+                <td>@{ rowNum++; } @rowNum</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeriesCategory)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Series)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeriesNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReservePrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HighestBiddingPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WinnerAIN)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OwnerName)
+                </td>
+            </tr>*@
+
+            <tr>
+                <td>@{ rowNum++; } @rowNum</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeriesCategory)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Series)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeriesNumber)
+                </td>
+                <td>
+                    @item.ReservePrice.ToString("N0")
+                </td>
+                <td>
+                    @item.HighestBiddingPrice.ToString("N0")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WinnerAIN)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OwnerName)
+                </td>
+            </tr>
+
+        }
+    </table>

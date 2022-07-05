@@ -1,0 +1,139 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Identity.User>
+
+@{
+    ViewData["Title"] = "Users/ Customers Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script src="~/lib/jquery.inputmask 5.0.2/jquery.inputmask.min.js"></script>
+    <script src="~/lib/jquery.inputmask 5.0.2/bindings/inputmask.binding.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var user = {
+                cnic: undefined,
+                email: undefined,
+                phonenumber: undefined,
+                pageNumber: 1,
+                pageSize: 10
+            };
+
+            function ResetDom() {
+
+                $("a.page").click(function (event) {
+
+                    event.preventDefault();
+
+                    var pageNumber = $(this).data("pagenumber");
+
+                    user.pageNumber = pageNumber;
+
+                    fetch(user);
+                });
+            }
+
+            function ResetForm() {
+
+                $("#cnic").val('');
+                $("#phonenumber").val('');
+                $("#email").val('');
+            }
+
+            function fetch(data) {
+
+                $("#loader").toggle();
+
+                $.get("@Url.Action("GetUsers", "Admin")", data,
+                    function (response) {
+
+                        $("#users").html(response);
+                    }//,"json"
+                )
+                .fail(function (error) {
+				    console.log(error);
+                })
+                .done(function () {
+                    $("#loader").toggle();
+                    ResetDom();
+                });
+            }
+
+            $("#searchBtn").click(function () {
+
+                user.cnic = $("#cnic").val();
+                user.phonenumber = $("#phonenumber").val();
+                user.email = $("#email").val();
+                user.pageNumber = 1;
+
+                fetch(user);
+            });
+
+            $("#resetBtn").click(function () {
+
+                $("#cnic").val("");
+                $("#phonenumber").val("");
+                $("#email").val("");
+
+                user.cnic = $("#cnic").val();
+                user.phonenumber = $("#phonenumber").val();
+                user.email = $("#email").val();
+                user.pageNumber = 1;
+
+                fetch(user);
+            });
+
+            fetch(user);
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9" id="selectedSeriesNumbersDiv">
+    <div class="detail-block">
+        <h1>Users/ Customers</h1>
+        <div class="auction-block">
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>CNIC</label>
+                            <input type="text" class="form-control" id="cnic" data-inputmask="'mask': '99999-9999999-9'" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" class="form-control" id="phonenumber" data-inputmask="'mask': '99999999999'" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="text" class="form-control" id="email" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <button type="button" id="searchBtn" class="btn btn-sm btn-primary">Search</button>
+                            <button type="button" id="resetBtn" class="btn btn-sm btn-default">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <br />
+                <div class="col-md-12" id="users">
+                    <partial name="_Users" model="Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Auction.Application>
+
+@if (Model.Pager != null)   // for MRA it will be null
+{
+    <div class="col-sm-12 alert-success">
+        <div class="col-md-12">
+            <h1>Total: @Model.Pager.TotalItems</h1>
+        </div>
+        <div class="col-md-6">
+            Showing @Model.Pager.StartIndex  to @Model.Pager.EndIndex of @Model.Pager.TotalItems Applications
+        </div>
+        <div class="col-md-6">
+            <div class="col-md-6">
+                Records/Page: <select asp-for="@Model.Pager.PageSize" asp-items="ViewBag.recordsPerPage"></select>
+            </div>
+            <div class="col-md-6">
+                Page: <select asp-for="@Model.Pager.CurrentPage" asp-items="ViewBag.pageNumbers"></select>
+                of @Model.Pager.TotalPages
+            </div>
+        </div>
+    </div>
+}
+
+<table class="registration-table add other">
+    <tr>
+        <th></th>
+        <th>Category</th>
+        <th>Series</th>
+        <th>Registration Mark</th>
+        <th>AIN</th>
+        <th>Application Status</th>
+        <th class="one">Details</th>
+    </tr>
+    @{
+        int rowNum = Model.Pager == null ? 0 : Model.Pager.StartIndex - 1;
+    }
+    
+    @if (Model.ListOfItems.Count == 0)
+    {
+        <tr>
+            <td colspan="8" class="text-md-center">NO PENDING APPLICATIONS AVAILABLE.</td>
+        </tr>
+    }
+
+    @foreach (var item in Model.ListOfItems)
+    {
+        <tr>
+            <td>@{ rowNum++; } @rowNum</td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeriesCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Series)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeriesNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AIN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "GetApplicationDetail", new { applicationId = item.Id }, htmlAttributes: new { @class = "btn-select" })
+            </td>
+        </tr>
+    }
+
+</table>

@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "provider": "filesystem",
+      "library": "C:\\Users\\Shahzad Ahmed\\.nuget\\packages\\jquery.inputmask\\5.0.2\\content\\Scripts\\inputmask",
+      "destination": "wwwroot/lib/jquery.inputmask 5.0.2/"
+    },
+    {
+      "provider": "filesystem",
+      "library": "C:\\Users\\Shahzad Ahmed\\.nuget\\packages\\jquery.inputmask\\5.0.2\\content\\Scripts\\inputmask\\bindings\\",
+      "destination": "wwwroot/lib/jquery.inputmask 5.0.2/bindings"
+    },
+    {
+      "provider": "filesystem",
+      "library": "C:\\Users\\Shahzad Ahmed\\.nuget\\packages\\microsoft.jquery.unobtrusive.ajax\\3.2.6\\Content\\Scripts",
+      "destination": "wwwroot/lib/microsoft.jquery.unobtrusive.ajax"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/js/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
+      ]
+    }
+  ]
+}

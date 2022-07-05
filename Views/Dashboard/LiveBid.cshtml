@@ -1,0 +1,139 @@
+﻿@model Models.Views.Dashboard.LiveBidList
+@{
+    ViewData["Title"] = "LiveBid";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<input type="hidden" id="hfSeriesID" value="0" />
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Live Bid </h1>
+        @using (Html.BeginForm("LiveBid", "Dashboard", FormMethod.Post))
+        {
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4" style="margin-top:16px;">Category</label>
+                            <div class="col-md-8">
+                                <select name="CateogryList" id="CateogryList">
+                                    <option value="0">All</option>
+                                    @if (ViewBag.CatID == "1")
+                                    {
+                                        <option value="1" selected="selected">Motor Car / موٹر کار</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Motor Car / موٹر کار</option>
+                                    }
+
+                                    @if (ViewBag.CatID == "3")
+                                    {
+                                        <option value="3" selected="selected">Motor Cycle / موٹر سائیکل</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="3">Motor Cycle / موٹر سائیکل</option>
+                                    }
+                                    @if (ViewBag.CatID == "4")
+                                    {
+                                        <option value="4" selected="selected">Commercial / کمرشل</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="4">Commercial / کمرشل</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4" style="margin-top:16px;">Series</label>
+                            <div class="col-md-8">
+                                <select name="SeriesList" id="SeriesList">
+                                    <option value="0">All</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4" style="margin-top:16px;">Reg No</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="RegNo" value="@ViewBag.RegNo" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="submit" value="Search" class="btn btn-success" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="auction-block">
+            <div class="col-md-12">
+                <h3>Live Bid Data </h3>
+                <div class="table-responsive" style="height:500px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Reg Number</th>
+                            <th>Base Price</th>
+                            <th>Highest Bid</th>
+                            <th>Time</th>
+                        </tr>
+                        @foreach (var item in Model.BidList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.RegNo
+                                </td>
+                                <td>
+                                    Rs/- @item.ReservePrice.ToString("00,00")
+                                </td>
+                                <td>
+                                    Rs/- @item.maxbid.ToString("00,00")
+                                </td>
+                                <td>
+                                    @item.TimeLeft
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($('#CateogryList').val() != "0") {
+            //alert('@ViewBag.SeriesID');
+            loadseries($('#CateogryList').val());
+        }
+        $("#CateogryList").change(function () {
+            loadseries($('#CateogryList').val());
+        });
+    });
+
+    function loadseries(catid) {
+        $.ajax({
+            type: "POST",
+            data: { "cateid": catid },
+            url: '@Url.Action("GetSeriesByCatID", "Dashboard")',
+            asyc: false,
+            success: function (response) {
+                var markup = "<option value='0'>All</option>";
+                for (var x = 0; x < response.length; x++) {
+                    markup += "<option value=" + response[x].seriesID + ">" + response[x].seriesName + "</option>";
+                }
+                $("#SeriesList").html(markup).show();
+                $("#SeriesList").val('@TempData["SeriesID"]');
+            }
+        });
+    }
+
+</script>

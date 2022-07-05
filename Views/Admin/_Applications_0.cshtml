@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Models.Views.Auction.Application>
+
+<table class="registration-table add other">
+    <tr>
+        <th></th>
+        <th>Category</th>
+        <th>Series</th>
+        <th>Registration Mark</th>
+        <th>AIN</th>
+        <th>Application Status</th>
+        <th class="one">Details</th>
+    </tr>
+    @{
+        int rowNum = 0;
+    }
+    @if (Model.Count() == 0)
+    { 
+        <tr>
+            <td colspan="8" class="text-md-center">NO PENDING APPLICATIONS AVAILABLE.</td>
+        </tr>
+    }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@{ rowNum++; } @rowNum</td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeriesCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Series)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeriesNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AIN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "GetApplicationDetail", new { applicationId = item.Id }, htmlAttributes: new { @class = "btn-select" })
+            </td>
+        </tr>
+    }
+</table>

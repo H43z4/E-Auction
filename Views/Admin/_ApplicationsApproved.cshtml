@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Models.Views.Reports.Application>
+
+    <table class="registration-table add other">
+        <tr>
+            <th>Sr.</th>
+            <th>MRA</th>
+            <th>Category</th>
+            <th>Series</th>
+            <th>Total Approved</th>
+        </tr>
+        @{
+            int rowNum = 0;
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@{ rowNum++; } @rowNum</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MRA)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeriesCategory)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeriesName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Count)
+                </td>
+            </tr>
+        }
+    </table>

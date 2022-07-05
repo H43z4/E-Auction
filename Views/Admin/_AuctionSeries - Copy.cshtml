@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Models.Views.Auction.Series>
+
+<table class="registration-table add other">
+    <tr>
+        <th></th>
+        <th>Category</th>
+        <th>Series</th>
+        <th>Status</th>
+        <th>Registration Start Date/Time</th>
+        <th>Registration End Date/Time</th>
+        <th class="one"></th>
+    </tr>
+    @{
+        int rowNum = 0;
+    }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@{ rowNum++; } @rowNum</td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeriesName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeriesStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegStartDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegEndDateTime)
+            </td>
+            <td>
+                @Html.ActionLink("Select", "GetSeriesDetail", new { seriesId = item.Id }, htmlAttributes: new { @class = "btn-select" })
+            </td>
+        </tr>
+    }
+</table>

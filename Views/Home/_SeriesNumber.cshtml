@@ -1,0 +1,88 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Auction.SeriesNumber>
+
+    <div class="rgDataDiv" style="overflow-y:scroll;overflow-x: hidden;height: 300px;">
+        <table class="registration-table paginated" id="seriesNumbers">
+            <thead>
+                <tr>
+                    <th width="50">Select</th>
+                    <th width="50">Registration Mark</th>
+                    <th width="300">Reserve Price</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr id="no_match_found" style="display: none;">
+                    <td colspan="3">NO MATCH FOUND</td>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model.ListOfItems)
+                {
+                    <tr>
+                        <td>
+                            @Html.CheckBox("selectedNumber", false, new { value = item.Id })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AuctionNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ReservePrice)
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="chasisNumber" style="display:none;" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="ownerName" style="display:none;" onkeypress="return isNumberKey(this, event);" />
+                            <input type="hidden" name="seriesNumberId" asp-for="@item.Id" />
+                        </td>
+                    </tr>
+                }
+
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center">
+        <div class="col-md-12">
+
+            @if (Model.Pager.EndPage > 1)
+            {
+                var seriesId = @Model.ListOfItems.FirstOrDefault().SeriesId;
+
+                <ul class="pagination pagination-sm">
+
+                    @if (Model.Pager.CurrentPage > 1)
+                    {
+                        <li>
+                            <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="1">First</a>
+                        </li>
+                        <li>
+                            <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(Model.Pager.CurrentPage - 1)">Previous</a>
+                        </li>
+                    }
+
+                    @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                    {
+                        <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+
+                            <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(page)">@(page)</a>
+                        </li>
+                    }
+
+                    @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                    {
+                        <li>
+                            <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(Model.Pager.CurrentPage + 1)">Next</a>
+                        </li>
+                        <li>
+                            <a href="" class="page" data-seriesId="@seriesId" data-pageNumber="@(Model.Pager.TotalPages)">Last</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+
+

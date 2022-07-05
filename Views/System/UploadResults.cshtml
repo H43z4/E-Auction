@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Winners";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //bool isSeriesAvailable = ViewBag.SeriesClosedForBiddingSelectList == null;
+    bool isSeriesAvailable = ((SelectList)ViewBag.SeriesClosedForBiddingSelectList).Count() > 0;
+    //bool isSeriesAvailable = ((List<SelectListItem>)ViewBag.SeriesClosedForBiddingSelectList).Count() == 0;
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Winners</h1>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="row">
+                    @if (isSeriesAvailable)
+                    {
+                        <form asp-action="UploadResults">
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <select id="seriesId" name="seriesId" asp-items="ViewBag.SeriesClosedForBiddingSelectList"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <input type="submit" class="btn-login" name="searchBtn" value="Upload Results to MVRS" style="margin-top: 7px;" />
+                                </div>
+                            </div>
+
+                        </form>
+                    }
+                    else
+                    {
+                        <p>Not available.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

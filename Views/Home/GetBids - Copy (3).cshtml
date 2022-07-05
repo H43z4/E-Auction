@@ -1,0 +1,356 @@
+﻿@model Models.Views.Auction.Bids
+@{
+    ViewData["Title"] = "Bidding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+    <link href="~/css/CountTimer.css" rel="stylesheet" />
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+    <style>
+        .modal-dialog {
+            background-color: #d0d0d0;
+        }
+
+        .table-responsive {
+            overflow-x: inherit !important;
+            min-height: 0.01%;
+        }
+    </style>
+
+    <script src="~/lib/Custom/AuctionTime.js"></script>
+    <script src="~/lib/Custom/EAuctionCutom.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+
+    <script type="text/javascript">
+
+        var customerId = 0;
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+
+            //Disable send button until connection is established
+            document.getElementsByClassName("btn-bid").disabled = true;
+
+            connection.on("ReceiveMessage", function (cusId, seriesNumberId, highestBidPrice, time) {
+                var highestPriceElement = document.getElementById(seriesNumberId + "_highestBiddingPriceId");
+                var timeBeforeHigestBidElement = document.getElementById(seriesNumberId + "_timeBeforeHigestBidId");
+                var bidderElement = document.getElementById(seriesNumberId + "_bidder");
+
+                highestPriceElement.innerHTML = highestBidPrice;
+                timeBeforeHigestBidElement.innerHTML = time;
+
+                if (customerId == cusId)
+                    bidderElement.innerHTML = "Your bidding";
+                else
+                    bidderElement.innerHTML = "Other person";
+            });
+
+            connection.start().then(function () {
+                console.log('connected!');
+                document.getElementsByClassName("btn-bid").disabled = false;
+            }).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+        });
+    </script>
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var auctionEndDateTime = $("#AuctionEndDateTime").val();
+            var sysDate = $("#SysDate").val();
+
+            ShowAuctionTiming(auctionEndDateTime, sysDate);
+
+            customerId = $("#custId").val();
+
+            console.log(customerId);
+
+            $(".btn-bid").on("click", function () {
+
+                //var $row = $(this).closest("tr");        // Finds the closest row <tr>
+
+                //var auctionNumber = $row.find("td:nth-child(4)").text();
+                //var ain = "XXX-YYY-ZZZ"; // $row.find("td:nth-child(5)").text();
+                //var highestPrice = $row.find("td:nth-child(7)").text();
+                //var lastBid = $row.find("td:nth-child(8)").text();
+
+
+                var btnId = $(this).prop('id');
+                var rowIds = btnId.split('_');
+
+                var idPrefix = "#" + rowIds[0];
+
+                var auctionNumber = idPrefix + "_auctionNumberId";
+                var ain = idPrefix + "_ainId";
+                var highestPrice = idPrefix + "_highestBiddingPriceId";
+                var lastBid = idPrefix + "_lastBiddingPriceId";
+
+                $("#JlblAuctionNumber").text($(auctionNumber).text());
+                $("#AIN").val($(ain).text());
+                $("#JlblHighestPrice").text($(highestPrice).text());
+                $("#JlblLastBidPrice").text($(lastBid).text());
+                $("#lblPopUpMsg").text('');
+
+                $('#Reportmodel').modal('toggle');
+            })
+            
+        });
+
+        function callAjaxMethod(e) {
+
+            e.preventDefault();
+            swal({
+                title: "Are You Sure?",
+                text: "Are you sure to submit new Bidding Price?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true,
+            },
+
+                function (isConfirm) {
+                    if (isConfirm) {
+
+                        var BidPrice = $("#JtxtBidPrice").val();
+                        var AIN = $("#AIN").val();
+
+                        BidPrice = parseInt(BidPrice.replace(/[^0-9]+/g, ""));
+
+                        if (isNaN(BidPrice)) {
+
+                            swal("Error!", "Invalid bid price.", "error");
+                            return;
+                        }
+
+                        var data = {
+                            BidPrice: BidPrice,
+                            AIN: AIN
+                        };
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/Home/SaveBid",
+                            //contentType: "application/json; charset=utf-8",
+                            data: data,
+                            dataType: "json",
+                            success: function (response) {
+                                if (response.status) {
+
+                                    var lastBiddingPriceElement = "#" + response.seriesNumberId + "_lastBiddingPriceId";
+                                    var timeBeforeLastBidElement = "#" + response.seriesNumberId + "_timeBeforeLastBidId";
+
+                                    $(lastBiddingPriceElement).text(BidPrice);
+                                    $(timeBeforeLastBidElement).text("Just now");
+
+                                    $("#JtxtBidPrice").val('');
+                                    document.getElementById("lblPopUpMsg").innerHTML = "Bid Sucessfull.";
+                                    document.getElementById("JlblLastBidPrice").innerHTML = BidPrice;
+
+                                    $('#Reportmodel').modal('hide');
+                                }
+                                else {
+                                    $("JtxtBidPrice").val('');
+                                    document.getElementById("lblPopUpMsg").innerHTML = response.msg;
+                                }
+                            },
+                            failure: function (response) {
+                                swal("Request Error!", "Request Error , Please try again latter." + response, "success");
+                            }
+                        });
+                    }
+                    else {
+                        swal("Cancelled", "Your imaginary file is safe :)", "error");
+                    }
+                });
+
+        }
+    </script>
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+
+        <div class="row">
+            @if (Model.Applications.Count > 0)
+            {
+                <div class="col-sm-6 pull-right">
+                    <h1>Remaining time for Auction</h1>
+                    @{
+                        var AuctionEndDateTime = Model.Applications.FirstOrDefault().AuctionEndDateTime.ToString("dd-MM-yyyy hh:mm:ss");
+                    }
+                    <input type="hidden" id="AuctionEndDateTime" value="@AuctionEndDateTime" />
+                    <input type="hidden" id="SysDate" value="@Model.SysDate" />
+                    <div id="clockdiv">
+                        <div>
+                            <span id="DaysSp" class="days"></span>
+                            <div class="smalltext">Days</div>
+                        </div>
+                        <div>
+                            <span id="HoursSP" class="hours"></span>
+                            <div class="smalltext">Hours</div>
+                        </div>
+                        <div>
+                            <span id="mintSP" class="minutes"></span>
+                            <div class="smalltext">Minutes</div>
+                        </div>
+                        <div>
+                            <span id="secSP" class="seconds"></span>
+                            <div class="smalltext">Seconds</div>
+                        </div>
+                    </div>
+                </div>
+                }
+                else
+                { 
+                    <div class="text-warning">Application(s) not approved.<br />Please, contact excise department.</div>
+                }
+        </div>
+
+        <div class="auction-block">
+            <div class="table-responsive">
+                @foreach (var item in Model.Applications)
+                {
+                    var highestBid = Model.HighestBids.FirstOrDefault(x => x.SeriesNumberId == item.SeriesNumberId);
+
+                    var highestBiddingPrice = 0;
+                    var timeBeforeHigestBid = string.Empty;
+                    var bidder = string.Empty;
+
+
+                    var highestBiddingPriceId = $"{item.SeriesNumberId}_highestBiddingPriceId";
+                    var timeBeforeHigestBidId = $"{item.SeriesNumberId}_timeBeforeHigestBidId";
+                    var bidderId = $"{item.SeriesNumberId}_bidder";
+
+                    var lastBiddingPrice = 0;
+                    var timeBeforeLastBid = string.Empty;
+
+
+                    var lastBiddingPriceId = $"{item.SeriesNumberId}_lastBiddingPriceId";
+                    var timeBeforeLastBidId = $"{item.SeriesNumberId}_timeBeforeLastBidId";
+
+                    var ainId = $"{item.SeriesNumberId}_ainId";
+                    var auctionNumberId = $"{item.SeriesNumberId}_auctionNumberId";
+                    var newBidButtonId = $"{item.SeriesNumberId}_newBidButtonId";
+
+
+                    if (highestBid != null)
+                    {
+                        highestBiddingPrice = highestBid.HighestBiddingPrice;
+                        timeBeforeHigestBid = eauction.Infrastructure.DateTimeTimeAgo.TimeAgo(highestBid.CreatedOn);
+                        bidder = Model.CustomerId == highestBid.CreatedBy ? "Your bidding" : "Other person";
+                    }
+
+                    var lastBid = Model.LastBids.FirstOrDefault(x => x.ApplicationId == item.Id);
+
+                    if (lastBid != null)
+                    {
+                        lastBiddingPrice = lastBid.LastBiddingPrice;
+                        timeBeforeLastBid = eauction.Infrastructure.DateTimeTimeAgo.TimeAgo(lastBid.CreatedOn);
+                    }
+
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="background-color:#c1d7cb;">
+                            <div class="row">
+                                <div class="col-md-6"></div>
+                                <div class="col-md-6">
+                                    <div class="col-md-4"><strong>Highest Bid Price</strong></div>
+                                    <div class="col-md-4"><strong>Your Last Bid Price</strong></div>
+                                    <div class="col-md-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table">
+                                        <tr><th>Category</th><td>@Html.DisplayFor(modelItem => item.SeriesCategory)</td></tr>
+                                        <tr><th>Series</th><td>@Html.DisplayFor(modelItem => item.Series)</td></tr>
+                                        <tr><th>Registration Mark</th><td><label id="@auctionNumberId">@item.SeriesNumber</label></td></tr>
+                                        <tr><th>AIN</th><td><label id="@ainId">@item.AIN</label></td></tr>
+                                        <tr><th>Reserve Price</th><td>@Html.DisplayFor(modelItem => item.ReservePrice)</td></tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="col-md-4">
+                                        <div id="clockdiv" style="font-size:20px;">
+                                            <div>
+                                                <span id="@highestBiddingPriceId">@highestBiddingPrice</span>
+                                                <div id="@timeBeforeHigestBidId" class="smalltext" style="font-size:12px;">@timeBeforeHigestBid</div>
+                                                <div id="@bidderId" class="smalltext" style="font-size:12px;">@bidder</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div id="clockdiv" style="font-size:20px;">
+                                            <div>
+                                                <span id="@lastBiddingPriceId">@lastBiddingPrice</span>
+                                                <div class="smalltext" style="font-size:12px;" id="@timeBeforeLastBidId">@timeBeforeLastBid</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="button" id="@newBidButtonId" class="btn btn-sm btn-primary btn-bid" value="New Bid" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-md" tabindex="-1" id="Reportmodel" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title">Bidding Price</h4>
+        </div>
+        <div class="modal-body">
+            <div class="Report">
+                <p>
+                    Registration Mark: <span>
+                        <label id="JlblAuctionNumber"></label>
+                    </span>
+                    <input type="hidden" id="AIN" />
+                    <input type="hidden" id="custId" value="@Model.CustomerId" />
+                </p>
+                <p>
+                    Your Last Bid: <span>
+                        <label id="JlblLastBidPrice"></label>
+                    </span>
+                </p>
+                Highest Bid: <span>
+                    <label id="JlblHighestPrice"></label>
+                </span>
+
+                <br />
+                <p>
+                    <input type="text" MaxLength="9" onkeyup="addComma(this);" onkeypress="return AllowNumbersOnly(event)" id="JtxtBidPrice" placeholder="New Bid Price" />
+                </p>
+                <br />
+                <div style="font-weight: bold" id="word"></div>
+            </div>
+            <p></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" id="btnJSubmit" onclick="callAjaxMethod(event)">Submit</button>
+            <label ForeColor="Red" id="lblPopUpMsg"></label>
+        </div>
+    </div>
+</div>

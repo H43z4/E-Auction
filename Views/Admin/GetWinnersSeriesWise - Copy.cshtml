@@ -1,0 +1,189 @@
+﻿@model IEnumerable<Models.Views.Auction.Winners>
+
+@{
+    ViewData["Title"] = "Winners";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    option.active {
+        display: inline-block;
+    }
+
+    option.inactive {
+        display: none;
+    }
+</style>
+
+@section Scripts
+{
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#SeriesId option').addClass("inactive");
+
+            $('#SeriesCategoryId').change(function () {
+
+                $('#SeriesId option').removeClass("inactive");
+                $('#SeriesId option').removeClass("active");
+                $('#SeriesId option').addClass("inactive");
+
+                var selectedCatId = $(this).val();
+
+                if (selectedCatId == "0") {
+
+                    $('#SeriesId option').removeClass("inactive");
+                    $('#SeriesId option').addClass("active");
+
+                }
+                else {
+
+                    var seriesopts = $('#SeriesId option');
+
+                    $.each(seriesopts, function (i, j) {
+
+                        var catid = $(this).data('catid');
+
+                        if ($(this).data('catid') == selectedCatId) {
+
+                            $(this).removeClass("inactive");
+                            $(this).addClass("active");
+                        }
+                    });
+                }
+
+                $("#SeriesId").val(-1);
+                $('#SeriesId option.active').eq(0).prop('selected', true);
+            });
+
+            BindEvents();
+
+            $("input[name=searchBtn]").click(function () {
+
+                //var seriesId = $("#SeriesId").val();
+                //$("input[name=seriesId]").val(seriesId);
+
+                fetch();
+            });
+
+            function fetch() {
+
+                $("#loader").toggle();
+
+                $.ajax({
+                    url: "/Admin/GetWinnersSeriesWise",
+                    data: {
+                        SeriesId: $("#SeriesId").val()
+                    },
+                    success: function (response) {
+                        $("div.table-responsive").html(response);
+                    },
+                    failure: function (response) {
+                        swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                    }
+                })
+                    .done(function () {
+                        $("#loader").toggle();
+
+                        BindEvents();
+                    });
+            }
+
+            function BindEvents() {
+
+                //$("#Pager_CurrentPage").on("change", function () {
+
+                //    fetch();
+                //});
+
+                //$("#Pager_PageSize").on("change", function () {
+
+                //    fetch();
+                //});
+            }
+        });
+    </script>
+}
+<div class="content-area col-sm-9">
+    @if (TempData.Count > 0)
+    {
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Success!</strong> Winners list approved successfully for @TempData["ApprovedSeries"]
+        </div>
+    }
+    <div class="detail-block">
+        <h1>Approval of Winners List</h1>
+        <br />
+        <div class="panel-group">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-3 push-right">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse1">Search</a>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse in">
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="col-md-3 text-right">Category</label>
+                                <div class="col-md-9">
+                                    <select id="SeriesCategoryId" asp-items="ViewBag.SeriesCategory">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 text-right">Series</label>
+                                <div class="col-md-9">
+                                    <select id="SeriesId">
+                                        @foreach (var series in (List<Models.Views.Auction.Series>)ViewBag.Series)
+                                        {
+                                            <option value="@series.Id" data-catid="@series.CategoryId">@series.SeriesName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-4">
+                                        <br />
+                                        <input type="button" class="btn btn-sm btn-primary" name="searchBtn" value="Search" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                    </div>
+                    <div class="panel-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-3"></div>
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <div class="auction-block">
+            <div class="table-responsive">
+                <partial name="_Winners" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>

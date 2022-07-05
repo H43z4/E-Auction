@@ -1,0 +1,77 @@
+﻿@page
+@model eauction.Areas.Identity.Pages.Account.ConfirmIdentityModel
+@{
+    ViewData["Title"] = "Confirm your identity";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>@ViewData["Title"]</h1>
+        
+        <br />
+        <div class="row">
+            <div class="col-sm-12 alert-success">
+                <strong>
+                    @ViewData["Message"]
+                </strong>
+            </div>
+        </div>
+
+        @if ((bool)ViewData["Status"] == false)
+        {
+            <div class="login-form">
+                <div class="form-holder col-md-8">
+                    <form method="post">
+                        <input asp-for="Input.UserId" type="hidden" id="userId" />
+                        <div class="form-group">
+                            <label asp-for="Input.OTP"></label>
+                            <input asp-for="Input.OTP" class="form-control" />
+                            <span asp-validation-for="Input.OTP" class="text-danger"></span>
+                        </div>
+                        <br />
+
+                        <div class="col-md-4 pull-left">
+                            <button type="submit" class="btn btn-primary">Verify</button>
+                        </div>
+                    </form>
+                    <div class="col-md-4 pull-right">
+                        <button class="btn btn-sm btn-default" id="resendCode">Resend PIN code</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+@section Scripts {
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#resendCode").click(function () {
+
+                $.ajax({
+                    url: "/API/Auth/ResendOTP",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ userId: parseInt($("#userId").val()) }),
+                    success: function (response) {
+                        if (response.status) {
+
+                            $("div.alert-success").html("New PIN code has been sent to you.");
+                        }
+                        else {
+                            $("div.alert-success").html(response.errors);
+                        }
+                    },
+                    failure: function (response) {
+                        $("div.alert-success").html("Problem in sending request.");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}

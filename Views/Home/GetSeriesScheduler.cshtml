@@ -1,0 +1,40 @@
+﻿@model eauction.Infrastructure.GenericPagedList<Models.Views.Auction.Series>
+
+@{
+    ViewData["Title"] = "Default";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <div class="content-area col-sm-9">
+        <div class="detail-block">
+            <div class="row">
+                <div class="col-md-9"><h1>Series Schedule</h1></div>
+            </div>
+            <br />
+
+            <div class="row">
+                <br />
+                <div class="table-responsive">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#Motorcycle" style="color:green;">Motorcycle</a></li>
+                        <li><a data-toggle="tab" href="#MotorCar" style="color:green;">Motor Car</a></li>
+                        <li><a data-toggle="tab" href="#Commercial" style="color:green;">Commercial</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="Motorcycle" class="tab-pane fade in active">
+                            <br />
+                            @await Html.PartialAsync("_AuctionSeries", Model.ListOfItems.Where(x => x.CategoryId == 3).OrderBy(x => x.SeriesName))
+                        </div>
+                        <div id="MotorCar" class="tab-pane fade">
+                            <br />
+                            @await Html.PartialAsync("_AuctionSeries", Model.ListOfItems.Where(x => x.CategoryId == 1).OrderBy(x => x.SeriesName))
+                        </div>
+                        <div id="Commercial" class="tab-pane fade">
+                            <br />
+                            @await Html.PartialAsync("_AuctionSeries", Model.ListOfItems.Where(x => x.CategoryId == 4).OrderBy(x => x.SeriesName))
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Models.Views.Auction.Application>
+
+@{
+    ViewData["Title"] = "Bidding Applications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    @if (TempData.Count > 0)
+    {
+        var newlySubmittedApps = TempData.SingleOrDefault(x => x.Key == "newlySubmittedApps").Value.ToString().Split(',');
+
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Success!</strong> New application(s) submitted against:
+            @foreach (var app in newlySubmittedApps)
+            {
+                <br />
+                var application = Model.SingleOrDefault(x => x.SeriesNumberId == Convert.ToInt32(app));
+
+                @application.AIN
+            }
+
+        </div>
+    }
+
+    <div class="detail-block">
+
+        <h1>Bidding Applications</h1>
+
+        <div class="alert alert-info" role="alert">
+            Please, print the challan form, deposit fee and submit in office of the Excise & Taxation Dept along with reserve price pay order Binaam Motor Registering Authority, for further processing.
+        </div>
+
+        <div class="auction-block">
+            <div class="table-responsive">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Category</th>
+                        <th>Series</th>
+                        <th>Series Number</th>
+                        <th>Reserve Price</th>
+                        <th>AIN</th>
+                        <th>Chassis Number</th>
+                        <th>Application Status</th>
+                        <th class="one"></th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SeriesCategory)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Series)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SeriesNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReservePrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AIN)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ChasisNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                            </td>
+                            <td>
+                                @if (item.ApplicationStatusId == 1)
+                                {
+                                    <a class="btn btn-sm btn-default" asp-action="GetChallan" asp-route-applicationId="@item.Id">Download Challan Form</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toNewWindow" style="display:none;">
+    <partial name="_Challan32Print.cshtml" />
+</div>

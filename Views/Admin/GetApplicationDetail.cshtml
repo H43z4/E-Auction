@@ -1,0 +1,368 @@
+﻿@model Models.Views.Auction.Application
+
+@{
+    ViewData["Title"] = "Application Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1 class="text-center">Application Detail</h1>
+        <div class="auction-block">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Category</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.SeriesCategory)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Series</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.Series)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Registration Mark</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.SeriesNumber)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Reserved Price</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.ReservePrice)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">AIN</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.AIN)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Chassis Number</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.ChasisNumber)
+                            @if (Model.ApplicationStatusId == 1)
+                            {
+                                <a class="btn-login" style="min-width: 90px; padding: 0px 0px 0px 0px;" asp-area="" asp-controller="Admin" asp-action="EditApplication" asp-route-applicationId="@Model.Id">Edit</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Owner Name</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.OwnerName)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Status</label>
+                        <div class="input-holder">
+                            @Html.DisplayFor(x => x.ApplicationStatus)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">PSID</label>
+                        <div class="input-holder">
+                            @Model.PSId
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Payment Status</label>
+                        <div class="input-holder">
+                            @{ var paymentStatus = Model.PaymentStatusId == 0 ? "Un-paid" : "Paid"; }
+                            @paymentStatus
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="field-holder">
+                        <label class="col-md-4">Paid On</label>
+                        <div class="input-holder">
+                            @{ var paidOn = Model.PaidOn.HasValue  ? Model.PaidOn.Value.ToString() : string.Empty; }
+                            @paidOn
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <div class="row">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Status</th>
+                        <th>Dated</th>
+                        <th>Comments</th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model.ApplicationStatusHistory)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedOn)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Comments)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-3"></div>
+<div class="content-area col-md-9">
+    <div class="detail-block">
+        <div class="auction-block">
+            @if (Model.ApplicationStatusId == 1 && Model.PaymentStatusId == 1 && Model.AuctionStartDateTime > DateTime.Now)
+            {
+                <h1 class="text-center">Bank Security</h1>
+
+                <form asp-action="ApproveApplication">
+                    @Html.Hidden("AppSecurityDeposit.ApplicationId", Model.Id)
+                    @Html.Hidden("AppSecurityDeposit.AppSecurityDepositStatusId", 1)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-4">Security Type</label>
+                                <div class="col-md-8">
+                                    <select asp-for="@Model.AppSecurityDeposit.BankDocumentTypeId" asp-items="@Model.AppSecurityDeposit.BankDocumentTypeSelectList"></select>
+                                    <span asp-validation-for="@Model.AppSecurityDeposit.BankDocumentTypeId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-4">Bank</label>
+                                <div class="col-md-8">
+                                    <select asp-for="@Model.AppSecurityDeposit.BankId" asp-items="@Model.AppSecurityDeposit.BankSelectList"></select>
+                                    <span asp-validation-for="@Model.AppSecurityDeposit.BankId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-4">Pay Order/ Challan No.</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(x => x.AppSecurityDeposit.DocumentIdValue, new { @class = "form-control" })
+                                    <span asp-validation-for="@Model.AppSecurityDeposit.DocumentIdValue" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-4">Worth</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(x => x.AppSecurityDeposit.Worth, new { @class = "form-control" })
+                                    <span asp-validation-for="@Model.AppSecurityDeposit.Worth" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-4">Diary No.</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(x => x.AppSecurityDeposit.DiaryNumber, new { @class = "form-control" })
+                                    <span asp-validation-for="@Model.AppSecurityDeposit.DiaryNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-4">Remarks</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(x => x.AppSecurityDeposit.Remarks, new { @class = "form-control" })
+                                    <span asp-validation-for="@Model.AppSecurityDeposit.Remarks" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="submit" value="Approve Application" class="btn btn-sm btn-primary" />
+                </form>
+            }
+            else if (Model.ApplicationStatusId == 5)
+            {
+                <h1 class="text-center">Bank Security</h1>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Security Type</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.AppSecurityDeposit.BankDocumentType)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Bank</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.AppSecurityDeposit.Bank)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Pay Order/ Challan No.</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.AppSecurityDeposit.DocumentIdValue)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Worth</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.AppSecurityDeposit.Worth)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="field-holder">
+                            <label class="col-md-4">Security Status</label>
+                            <div class="input-holder">
+                                @Html.DisplayFor(x => x.AppSecurityDeposit.AppSecurityDepositStatus)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+                if (Model.AppSecurityDeposit.AppSecurityDepositStatusId == 1)
+                {
+                    <form asp-action="SaveSecurity">
+                        @Html.Hidden("AppSecurityDeposit.Id", Model.AppSecurityDeposit.Id)
+                        @Html.Hidden("AppSecurityDeposit.ApplicationId", Model.Id)
+                        @Html.Hidden("AppSecurityDeposit.AppSecurityDepositStatusId", 2)
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-4">Diary Number (to return the security)</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(x => x.AppSecurityDeposit.DiaryNumber, new { @class = "form-control" })
+                                        <span asp-validation-for="@Model.AppSecurityDeposit.DiaryNumber" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="submit" value="Return Security to Customer" class="btn btn-sm btn-primary" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                }
+
+                <br />
+
+                <div class="row">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th></th>
+                            <th>Status</th>
+                            <th>Dated</th>
+                            <th>Diary Number</th>
+                            <th>Conducted By</th>
+                            <th>Comments</th>
+                        </tr>
+                        @{
+                            rowNum = 0;
+                        }
+                        @foreach (var item in Model.AppSecurityDeposit.AppSecurityDepositStatusHistory)
+                        {
+                            <tr>
+                                <td>@{ rowNum++; } @rowNum</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AppSecurityDepositStatus)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DiaryNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreatedBy)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Comments)
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

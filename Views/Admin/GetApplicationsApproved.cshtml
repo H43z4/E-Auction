@@ -1,0 +1,162 @@
+﻿@model IEnumerable<Models.Views.Reports.Application>
+
+@{
+    ViewData["Title"] = "Winners";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    option.active {
+        display: inline-block;
+    }
+
+    option.inactive {
+        display: none;
+    }
+</style>
+
+@section Scripts
+{
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+
+        function bindSelectLists(targetControl, data, dataIDField, dataTextField, addDefault, defaultText, selectedValue) {
+            $(targetControl).find('option')
+                .remove();
+
+            if (defaultText === undefined || defaultText === null) {
+                defaultText = 'Choose your option';
+            }
+
+            if (addDefault)
+                $(targetControl).append($("<option />").val('').text(defaultText));
+
+            $.each(data, function (index, value) {
+                $(targetControl).append($("<option />").val(this[dataIDField]).text(this[dataTextField]));
+            });
+        }
+
+        $(document).ready(function () {
+
+            $(document).on('change', '#SeriesCategoryId', function (event) {
+
+                $("#loader").toggle();
+
+			var val = $(this).val();
+
+                $.get("@Url.Action("GetSeriesAll", "LOV")", { seriesCategoryId: val }, function (response) {
+
+                    bindSelectLists($('#SeriesId'), response.series, 'id', 'seriesName', true, 'All');
+
+			}, "json").fail(function (error) {
+				console.log(error);
+            })
+                    .done(function () {
+                        $("#loader").toggle();
+                    });
+
+		});
+
+            $("input[name=searchBtn]").click(function () {
+
+                fetch();
+            });
+
+            function fetch() {
+
+                $("#loader").toggle();
+
+                $.ajax({
+                    url: "/Admin/GetApplicationsApproved",
+                    data: {
+                        SeriesCategoryId: $("#SeriesCategoryId").val(),
+                        SeriesId: $("#SeriesId").val()
+                    },
+                    success: function (response) {
+                        $("div.table-responsive").html(response);
+                    },
+                    failure: function (response) {
+                        swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                    }
+                })
+                    .done(function () {
+                        $("#loader").toggle();
+                    });
+            }
+
+        });
+    </script>
+}
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Approved Applications</h1>
+        <br />
+        <div class="panel-group">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-3 push-right">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse1">Search</a>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse in">
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="col-md-3 text-right field-lable">Category</label>
+                                <div class="col-md-6">
+                                    <select id="SeriesCategoryId" asp-items="ViewBag.SeriesCategory">
+                                        <option>All</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 text-right field-lable">Series</label>
+                                <div class="col-md-6">
+                                    <select id="SeriesId">
+                                        <option>All</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-4">
+                                        <br />
+                                        <input type="button" class="btn-login" name="searchBtn" value="Search" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                        </div>
+                    </div>
+                    <div class="panel-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-3"></div>
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <div class="auction-block">
+            <div class="table-responsive">
+                <partial name="_ApplicationsApproved" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>

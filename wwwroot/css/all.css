@@ -1,0 +1,744 @@
+/*  ---------------------------------------------------------
+	1. General reset
+	2. Common site styles
+	3. Custom form styles
+	4. Styles for responsive breakpoints
+	---------------------------------------------------------*/
+/*  ---------------------------------------------------------
+	1. General reset
+	---------------------------------------------------------*/
+* { max-height: 100000px;}
+body {
+	min-width: 320px;
+	line-height: 18px;
+	background:#c0d5cb url(../images/img02.jpg) no-repeat;
+	background-position: 50% 50%;
+	background-size: cover;
+}
+a:hover,
+a:focus,
+a:active {
+	outline: none;
+}
+@-webkit-viewport {width: device-width;}
+@-moz-viewport {width: device-width;}
+@-ms-viewport {width: device-width;}
+@-o-viewport {width: device-width;}
+@viewport {width: device-width;}
+/* placeholder input styles */
+::-webkit-input-placeholder { color: #333;}
+:-moz-placeholder { color: #333;}
+::-moz-placeholder {
+	color: #333;
+	opacity: 1;
+}
+:-ms-input-placeholder { color: #333;}
+/*  ---------------------------------------------------------
+	2. Сommon site styles
+	---------------------------------------------------------*/
+/* main container styles */
+#wrapper{
+	overflow: hidden;
+}
+/* header styles */
+#header{
+	background:url(../images/img01.jpg) no-repeat;
+	min-height:121px;
+	-webkit-background-size: cover;
+	background-size: cover;
+	-webkit-background-size: 100% 100%;
+	background-size: 100% 100%;
+	background-position:50% 50%;
+	border-bottom:5px solid #477c99;
+}
+.latest-news {
+	overflow: hidden;
+	background: #fff;
+}
+.latest-news .title {
+	float: left;
+	position: relative;
+	background: #477c99;
+	color: #fff;
+	font-size: 19px;
+	line-height: 22px;
+	text-transform: uppercase;
+	font-weight: 700;
+	width: 247px;
+	padding: 12px 15px 13px;
+}
+.latest-news .title:after {
+	position: absolute;
+	top: 0;
+	right: -15px;
+	content: '';
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 23px 0 23px 15px;
+	border-color: transparent transparent transparent #477c99;
+}
+.latest-news .title span {
+	display: block;
+	text-align: center;
+}
+.latest-news .holder {
+	overflow: hidden;
+    color: #477c99 !important;
+    font-weight: bold;
+}
+/* slideshow basic styles */
+.latest-news .slideshow {
+	position: relative;
+	height: 46px;
+}
+.latest-news .slideshow .slide {
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	right: 0;
+	padding: 7px 43px 15px;
+}
+.latest-news .slide p { margin: 0; }
+.latest-news .slide.active {
+	z-index: 2;
+}
+/*.latest-news .slideshow.not-enough-slides .btn-prev,
+.latest-news .slideshow.not-enough-slides .btn-next {
+	visibility: hidden;
+}*/
+.latest-news .slideshow .btn-next,
+.latest-news .slideshow .btn-prev {
+	position: absolute;
+	text-indent: -9999px;
+	overflow: hidden;
+	top: 14px;
+	right: 20px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 5px 5px 5px;
+	border-color: transparent transparent #000 transparent;
+	z-index: 999;
+}
+.latest-news .slideshow .btn-next {
+	border-color: #000 transparent transparent transparent;
+	border-width: 5px 5px 0 5px;
+	top: 27px;
+}
+/* main informative part styles */
+#main{
+	overflow: hidden;
+}
+.main-section {
+	padding: 10px 0;
+}
+#sidebar .side-list {
+	margin: 0;
+	font-size: 15px;
+	line-height: 18px;
+	text-transform: uppercase;
+	border-top:1px solid #228559;
+}
+#sidebar .side-list li {
+	border-bottom:1px solid #c2d7cd;
+}
+#sidebar .side-list li a {
+	color: #fff;
+	padding: 12px 20px;
+	display: block;
+	background: #284f68;
+	transition:all 0.4s ease;
+}
+#sidebar .side-list li a:hover {
+	transition:all 0.4s ease;
+	background: #477c99;
+}
+.main-section .detail-block {
+	background: #f3f9f6;
+	min-height:100px;
+	padding: 1px 25px 15px 25px;
+}
+.main-section .detail-block h1 {
+	font-size: 22px;
+	line-height: 25px;
+	text-transform: uppercase;
+	font-weight: 900;
+	color: #284f68;
+	margin: 12px 0 5px;
+}
+
+.login-form {
+	overflow: hidden;
+}
+.login-form .form-holder {
+	overflow: hidden;
+}
+.login-form .field-holder {
+	overflow: hidden;
+	margin: 0 0 25px;
+}
+.login-form .field-holder label {
+	float: left;
+	min-width:170px;
+	margin:10px 15px 10px 0;
+}
+
+.login-form .form-control:focus {
+	box-shadow: none;
+}
+.login-form .buttons-holder {
+	overflow: hidden;
+	padding: 0 0 0 185px;
+}
+	.login-form .buttons-holder .btn-login, .btn-login {
+		display: inline-block;
+		vertical-align: bottom;
+		min-width: 130px;
+		text-align: center;
+		border-radius: 15px;
+		font-size: 15px;
+		line-height: 18px;
+		font-weight: 700;
+		text-transform: uppercase;
+		padding: 7px 10px;
+		background: #477c99;
+		border: 1px solid #477c99;
+		transition: all 0.4s ease;
+		color: #fff;
+	}
+.login-form .buttons-holder .btn-login:hover {
+	background: #284f68;
+	transition:all 0.4s ease;
+}
+.login-form .buttons-holder .btn-forget {
+	display: inline-block;
+	vertical-align: bottom;
+	font-size: 15px;
+	line-height: 18px;
+	color: #000;
+	font-weight: 700;
+	margin: 0 0 0 15px;
+} 
+.login-form .buttons-holder .btn-forget:hover {
+	text-decoration: underline;
+}
+.main-section .detail-block .text {
+	display: block;
+	font-size: 15px;
+	line-height: 18px;
+	color: #000;
+	margin: 0 0 25px;
+}
+.table-holder {
+	overflow: hidden;
+	height: 350px;
+	/*overflow:auto;*/
+	margin: 0 0 20px;
+}
+.table-holder.add {
+	height:inherit;
+}
+.registration-table {
+	width: 100%;
+}
+.registration-table th {
+	background: #b7cec4;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	color: #000;
+	padding: 10px 20px;
+	min-width:266px;
+	text-align: center;
+}
+.registration-table th.one {
+	min-width:55px;
+}
+.registration-table tr:first-child { border-bottom:2px solid #f4faf7; }
+.registration-table tr td {
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	padding: 6px 10px;
+	text-align: center;
+	background: #cfe6dc;
+}
+.register-list {
+	letter-spacing: -5px;
+	background: #cfe6dc;
+	text-align: center;
+	margin: 0;
+}
+.register-list li {
+	display: inline-block;
+	vertical-align: top;
+	letter-spacing: normal;
+	width: 20%;
+	padding: 10px 0;
+}
+.register-list li span {
+	padding: 0 10px;
+	display: inline-block;
+	vertical-align: top;
+}
+.register-list li span span {
+	display: block;
+}
+.register-list li .btn-select {
+	display: inline-block;
+	vertical-align: middle;
+	min-width:100px;
+	text-align: center;
+	border-radius: 15px;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	text-transform: uppercase;
+	padding: 7px 10px;
+	background: #477c99;
+	border:1px solid #477c99;
+	transition:all 0.4s ease;
+	color: #fff;
+}
+.registration-table tr:nth-child(2n) td {
+	background: #e4f5ed;
+}
+.login-form.add .buttons-holder {
+	padding: 0;
+	text-align: right;
+}
+.main-section .detail-block .ain-number {
+	display: block;
+	width: 500px;
+	text-align: center;
+	background: #b7cec4;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	padding: 10px 10px;
+	margin: 0 0 20px;
+}
+.main-section .detail-block .ain-number span {
+	display: inline-block;
+	vertical-align: top;
+}
+.download-list {
+	margin: 0;
+	font-size: 15px;
+	line-height: 18px;
+	color: #000;
+}
+.download-list li {
+	display: block;
+	overflow: hidden;
+	margin: 0 0 10px;
+}
+.download-list li span {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 20px 0 0;
+}
+.download-list li .btn-download {
+	display: inline-block;
+	vertical-align: middle;
+	min-width:130px;
+	text-align: center;
+	border-radius: 15px;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	text-transform: uppercase;
+	padding: 7px 10px;
+	background: #477c99;
+	border:1px solid #477c99;
+	transition:all 0.4s ease;
+	color: #fff;
+}
+.download-list li .btn-download:hover {
+	background: #284f68;
+	transition:all 0.4s ease;
+}
+.main-section .detail-block .title {
+	display: block;
+	margin: 0 0 15px;
+}
+.notes-holder {
+	overflow: hidden;
+	color: #f00;
+}
+.notes-holder .notes {
+	font-size: 700px;
+	display: block;
+	margin: 0 0 13px;
+}
+.auction-block {
+	overflow: hidden;
+}
+.counter-block {
+	overflow: hidden;
+}
+.auction-block .series-list {
+	margin: 0 0 30px;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+}
+.auction-block .series-list li {
+	padding: 0;
+}
+.auction-block .series-list li span {
+	display: inline-block;
+	vertical-align: top;
+}
+.auction-block .series-list li:first-child {
+	margin: 0 100px 0 0;
+}
+.registration-table.add th {
+	min-width:165px;
+}
+.registration-table.add th.one {
+	min-width:120px;
+}
+.registration-table tr td.add {
+	text-align: left;
+	width: 140px;
+}
+.registration-table tr td .btn-select {
+	display: inline-block;
+	vertical-align: middle;
+	min-width:100px;
+	text-align: center;
+	border-radius: 15px;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	text-transform: uppercase;
+	padding: 7px 10px;
+	background: #477c99;
+	border:1px solid #477c99;
+	transition:all 0.4s ease;
+	color: #fff;
+}
+.registration-table.add tr td {
+	font-size: 400px;
+	font-size: 12px;
+	line-height: 15px;
+	width: 100px;
+}
+.registration-table.add tr td span {
+	display: block;
+	color: #ec0b0b;
+}
+.district-selector {
+	letter-spacing: -5px;
+	margin: 0 -10px 30px;
+}
+.district-selector .select-holder,
+.district-selector .title-text {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 0 10px;
+	letter-spacing: normal;
+	width: 50%;
+}
+.registration-table.add.other th {
+	min-width: 80px;
+}
+.procedure-list {
+	margin: 0;
+	/*padding: 0 0 0 15px;*/
+    overflow: auto;
+    max-height:260px;
+}
+.procedure-list > li {
+	font-size: 15px;
+	line-height: 18px;
+	margin: 0 0 15px;
+}
+.marks-list {
+	margin: 0;
+	list-style:lower-roman;
+	text-align: left;
+	font-weight: 400;
+	font-size: 15px;
+	line-height: 18px;
+}
+.marks-list li {
+	margin: 0 0 10px;
+}
+.registration-table.add.home tr td {
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 400;
+}
+.registration-table.add tr td span.value {
+	display: block;
+	font-weight: 400;
+	color: #000;
+}
+.form-control {
+	border-radius: 3px;
+}
+.agree-footer {
+	overflow: hidden;
+	color: #477c99;
+	letter-spacing: -5px;
+	padding: 20px 0 0;
+	border-top:2px dashed #228559;
+	margin: 10px 0;
+}
+.agree-footer label {
+	font-weight: 700;
+}
+.agree-footer input[type=checkbox] {
+	margin: 2px 0 0 -20px;
+}
+.agree-footer .button-holder,
+.agree-footer .checkbox-holder {
+	display: inline-block;
+	vertical-align: middle;
+	letter-spacing: normal;
+	width: 50%;
+}
+.agree-footer .button-holder {
+	text-align: right;
+}
+.agree-footer .button-holder .btn-next {
+	display: inline-block;
+	vertical-align: middle;
+	min-width:100px;
+	text-align: center;
+	border-radius: 15px;
+	font-size: 15px;
+	line-height: 18px;
+	font-weight: 700;
+	text-transform: uppercase;
+	padding: 7px 10px;
+	background: #477c99;
+	border:1px solid #477c99;
+	transition:all 0.4s ease;
+	color: #fff;
+}
+
+.modal-body input[type=text]{
+    height: 50px;
+width: 50%;
+border-radius: 2px;
+border: none;
+padding: 8px;
+font-weight: bold;
+color: green;
+margin-top:15px;
+}
+.modal-footer{
+    text-align:left !important;
+}
+
+/* footer styles */
+#footer {
+	overflow: hidden;
+}
+.footer-holder {
+	padding: 0 15px 10px 307px;
+	font-size: 15px;
+	line-height: 18px;
+	text-align: center;
+}
+#footer p { margin: 0; }
+#footer p a {
+	display: inline-block;
+	vertical-align: top;
+	color: #000;
+	transition:all 0.4s ease;
+}
+#footer p a:hover {
+	transition:all 0.4s ease;
+	color: #284f68;
+}
+.ain{
+    color:red;
+    padding:inherit !important;
+    font-size:11px;
+}
+.ago{
+    color:#477C99;
+}
+
+html body .riSingle .riTextBox[type="text"] {
+
+    display: block;
+width: 100%;
+height: 35px;
+padding: 6px 12px;
+font-size: 15px;
+line-height: 1.42857143;
+color: #284f68;
+background-color: #eef4f1;
+background-image: none;
+border: 1px solid #284f68;
+-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+
+
+}
+.RadPicker {
+    
+width: 100% !important;
+height: 20px;
+}
+.alert-danger {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+    padding: 14px;
+    font-size: xx-large;
+}
+.alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #3c763d;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+.process-outer {
+    margin: 0 0 20px;
+}
+
+label.field-lable {
+	padding: 13px 10px 13px 10px;
+}
+.field-box, input[type=text],select{
+    width: 100%;
+    border: 2px solid #d2d2d2 !important;
+    color:#333;
+    font-weight:bold;
+    font-size: 16px;
+    line-height: 19px;
+    /*padding: 13px 10px !important;*/
+    padding: 13px 10px;
+    margin: 0 0 10px;
+    border-radius: 5px;
+}
+.field-box .RadComboBox_Default .rcbInputCell, .RadComboBox_Default .rcbArrowCell {
+	background-image: none;
+}
+
+.field-box .RadComboBox_Default .rcbInputCell, .RadComboBox_Default .rcbArrowCell {
+background-image:none;
+}
+.RadComboBox_Default .rcbReadOnly .rcbArrowCellRight {
+    background-image:none;
+}
+.RadComboBox_Default {
+ width:100% !important;
+}
+/*  ---------------------------------------------------------
+	3. Styles for Responsive web design
+	---------------------------------------------------------*/
+@media screen and (max-width:1200px) {
+}
+@media screen and (max-width:992px) {
+}
+@media screen and (max-width:767px) {
+	#header {
+		background-position: 50% 50%;
+		margin: 0 -40px;
+		min-height:45px;
+	}
+	.latest-news {
+		display: none;
+	}
+	.main-section .detail-block {
+		padding: 15px 15px;
+	}
+	.main-section .detail-block h1 {
+		font-size: 18px;
+		line-height: 21px;
+		margin: 0 0 15px;
+	}
+	.login-form .field-holder {
+		margin: 0 0 15px;
+	}
+	.login-form .field-holder label {
+		float: none;
+		display: block;
+		margin: 0 0 10px;
+		min-width:inherit;
+	}
+	.login-form .buttons-holder {
+		padding: 0;
+	}
+	.login-form .buttons-holder .btn-forget,
+	.login-form .buttons-holder .btn-login {
+		vertical-align: middle;
+	}
+	.main-section .detail-block .ain-number {
+		width:auto;
+	}
+	.footer-holder {
+		padding: 10px 15px;
+	}
+	.district-selector .select-holder,
+	.district-selector .title-text {
+		display: block;
+		width: 100%;
+		margin: 0 0 5px;
+	}
+	.navbar-collapse {
+		padding:0;
+		border: none;
+		box-shadow: none;
+	}
+	.navbar-toggle {
+		border-color:#2b3f47;
+	}
+	.navbar-toggle:hover,
+	.navbar-toggle:focus {
+		background: #2b3f47;
+		border-color:#2b3f47;
+	}
+	.navbar-toggle .icon-bar,
+	.navbar-toggle .icon-bar {
+		background: #2b3f47;
+	}
+	.navbar-toggle:hover .icon-bar,
+	.navbar-toggle:focus .icon-bar {
+		background: #fff;
+	}
+	.agree-footer .button-holder, .agree-footer .checkbox-holder {
+		display: block;
+		width: 100%;
+		margin: 0 0 10px;
+	}
+	.agree-footer .button-holder .btn-next {
+		display: block;
+		width: 100%;
+		margin: 0 auto;
+	}
+	.login-form.add .buttons-holder {
+		text-align: center;
+	}
+	.login-form .buttons-holder .btn-login {
+		min-width:110px;
+	}
+	.registration-table.add tr td {
+		width: 100%;
+	}
+	.registration-table.add th {
+		display: block;
+	}
+	.register-list li {
+		display: block;
+		width: 100%;
+		margin: 0 0 2px;
+	}
+
+    
+}
+
+

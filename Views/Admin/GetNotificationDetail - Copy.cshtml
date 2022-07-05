@@ -1,0 +1,99 @@
+﻿@model Models.Views.Notification.Notification
+
+@{
+    ViewData["Title"] = "Notification Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Notification Detail</h1>
+        <div class="auction-block">
+            <br />
+            <form asp-action="SaveNotification">
+                <input type="hidden" asp-for="Id" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-4">Heading</label>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(x => x.Heading, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-4">Content</label>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(x => x.Content, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-4">Data</label>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(x => x.Data, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-4">Status</label>
+                            <div class="col-md-8">
+                                <select asp-for="NotificationStatusId" asp-items="@ViewBag.NotificationStatusSelectList"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <input type="submit" class="btn-login" value="Save" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <br />
+            <div class="row">
+                <table class="registration-table add other">
+                    <tr>
+                        <th></th>
+                        <th>Status</th>
+                        <th>Dated</th>
+                        <th>Comments</th>
+                    </tr>
+                    @{
+                        int rowNum = 0;
+                    }
+                    @foreach (var item in Model?.NotificationStatusHistory)
+                    {
+                        <tr>
+                            <td>@{ rowNum++; } @rowNum</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NotificationStatus)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedOn)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Comments)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

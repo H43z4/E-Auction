@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - eauction</title>
+    <link href="~/lib/bootstrap337/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/all.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap337/bootstrap.min.js"></script>
+    <script src="~/js/jquery.main.js"></script>
+</head>
+<body>
+
+    <!-- main container of all the page elements -->
+    <div id="wrapper">
+        <!-- header of the page -->
+        <header id="header">
+            <div class="pull-right" style="margin: 95px 10px 0px 0px;color: white;">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Profile" title="Manage">Hello @User.Identity.Name</a>
+                }
+            </div>
+            <div class="container">
+                <!-- page logo -->
+                <div class="logo"><a href=""><img src="" alt=""></a></div>
+            </div>
+        </header>
+        <main id="main" role="main">
+            <div id="content" class="container">
+                <section class="latest-news">
+                    <strong class="title"><span>Latest News</span></strong>
+                    <div class="holder">
+                        <!-- slideshow structure example -->
+                        <div class="slideshow">
+                            <div class="slideset">
+
+                            </div>
+                            <a class="btn-prev" href="#">Previous</a>
+                            <a class="btn-next" href="#">Next</a>
+                        </div>
+                    </div>
+                </section>
+                <section class="main-section row">
+                    <aside id="sidebar" class="col-sm-3">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="side-list list-unstyled">
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    //var check = User.IsInRole("SuperAdmin");
+
+                                    if (User.IsInRole("System"))
+                                    {
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="FindApplications">Customers' Applications</a></li>
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="GetWinners">Winners</a></li>
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="GetNotifications">Notifications</a></li>
+                                        <li><a asp-area="" asp-controller="Dashboard" asp-action="GetDashboard">Dashboard</a></li>
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="GetAuctionSeriesStatusWise">Series</a></li>
+                                        <li><a asp-area="" asp-controller="System" asp-action="Synchronize">Synchronize with MVRS</a></li>
+                                        <li><a asp-area="" asp-controller="System" asp-action="UploadWinners">Upload Winners</a></li>
+                                    }
+                                    else if (User.IsInRole("SuperAdmin"))
+                                    {
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="FindApplications">Customers' Applications</a></li>
+                                        <li><a asp-area="" asp-controller="Home" asp-action="GetWinners">Winners</a></li>
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="GetNotifications">Notifications</a></li>
+                                        <li><a asp-area="" asp-controller="Dashboard" asp-action="GetDashboard">Dashboard</a></li>
+                                    }
+                                    else if (User.IsInRole("Admin"))
+                                    {
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="FindApplications">Customers' Applications</a></li>
+                                        <li><a asp-area="" asp-controller="Admin" asp-action="GetWinners">Winners</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li><a asp-area="" asp-controller="Home" asp-action="GetAuctionSeries">Series</a></li>
+                                        <li><a href="/Home/GetApplications">Applications</a></li>
+                                        <li><a asp-area="" asp-controller="Home" asp-action="GetBids">Bidding</a></li>
+                                        <li><a asp-area="" asp-controller="Home" asp-action="GetWinners">Winners</a></li>
+                                    }
+
+                                    <li><a href="/Identity/Account/ChangePassword">Change Password</a></li>
+
+                                    <li>
+                                        <script type="text/javascript">
+                                            $(document).ready(function () {
+                                                $("#logout").click(function (e) {
+                                                    e.preventDefault();
+                                                    $("#logoutForm").submit();
+                                                });
+                                            })
+                                        </script>
+                                        <a href="" id="logout">Logout</a>
+                                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Default", "Home", new { area = "" })">
+                                        </form>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li><a asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+                                    <li><a asp-area="Identity" asp-page="/Account/Register">Sign Up</a></li>
+                                }
+
+                                <li><a asp-area="" asp-controller="Home" asp-action="Howtodo">How to e-auction</a></li>
+
+                            </ul>
+                        </div>
+                    </aside>
+                    @RenderBody()
+                </section>
+            </div>
+        </main>
+        <!-- footer of the page -->
+        <footer id="footer">
+            <div class="footer-holder container">
+                @*<p style="color:darkslategrey;">Developed By: <a href="http://pitb.gov.pk/" target="_blank">Punjab Information Technology Board.  All rights reserved.</a></p>*@
+            </div>
+        </footer>
+    </div>
+
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

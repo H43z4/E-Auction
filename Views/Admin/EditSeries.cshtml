@@ -1,0 +1,126 @@
+﻿@model Models.Views.Auction.Series
+
+@{
+    ViewData["Title"] = "Add/ Edit Series";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .custom-select {
+        padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
+    }
+
+    .form-group label {
+        padding: 5px 0px 0px 0px;
+    }
+
+    .toUpper {
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="content-area col-sm-9">
+    @if (TempData.Count > 0)
+    {
+        if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong>Error!</strong> @TempData["Error"]
+            </div>
+        }
+    }
+    <div class="detail-block">
+        <h1>Add/ Edit Series</h1>
+        <div class="auction-block">
+            <form asp-action="SaveSeries">
+                <input type="hidden" asp-for="Id" />
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right">Category</label>
+                            <div class="col-md-6">
+                                <select class="form-control custom-select" asp-for="CategoryId" asp-items="ViewBag.SeriesCategorySelectList"></select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right">Series</label>
+                            <div class="col-md-6">
+                                <input class="form-control toUpper" asp-for="SeriesName" />
+                                <span asp-validation-for="SeriesName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right">Reg. Start Date Time</label>
+                            <div class="col-md-6">
+                                <input class="form-control" asp-for="RegStartDateTime" />
+                                <span asp-validation-for="RegStartDateTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right">Reg. End Date Time</label>
+                            <div class="col-md-6">
+                                <input class="form-control" asp-for="RegEndDateTime" />
+                                <span asp-validation-for="RegEndDateTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right">Auction Start Date Time</label>
+                            <div class="col-md-6">
+                                <input class="form-control" asp-for="AuctionStartDateTime" />
+                                <span asp-validation-for="AuctionStartDateTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right">Auction End Date Time</label>
+                            <div class="col-md-6">
+                                <input class="form-control" asp-for="AuctionEndDateTime" />
+                                <span asp-validation-for="AuctionEndDateTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 text-right"></label>
+                            <div class="col-md-6">
+                                <input type="submit" class="btn-login" value="Save" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

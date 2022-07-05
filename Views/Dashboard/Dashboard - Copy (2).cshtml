@@ -1,0 +1,214 @@
+﻿@model Models.Views.Dashboard.Dashboard
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Dashboard </h1>
+        @using (Html.BeginForm("Dashboard", "Dashboard", FormMethod.Post))
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4" style="margin-top:16px;">Category</label>
+                            <div class="col-md-8">
+                                <select name="CateogryList">
+                                    <option value="0">All</option>
+                                    @if (ViewBag.CatID == "1")
+                                    {
+                                        <option value="1" selected="selected">Motor Car / موٹر کار</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Motor Car / موٹر کار</option>
+                                    }
+
+                                    @if (ViewBag.CatID == "3")
+                                    {
+                                        <option value="3" selected="selected">Motor Cycle / موٹر سائیکل</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="3">Motor Cycle / موٹر سائیکل</option>
+                                    }
+                                    @if (ViewBag.CatID == "4")
+                                    {
+                                        <option value="4" selected="selected">Commercial / کمرشل</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="4">Commercial / کمرشل</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="submit" value="Search" class="btn btn-success btn-lg" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="auction-block">
+            <div class="col-md-3 text-center alert btn-primary col-md-offset-1">
+                <h5>Total Applications</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalApplications.ToString("00,00")</p>
+            </div>
+            <div class="col-md-3 text-center alert btn-danger">
+                <h5> Approved Applications</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalApprovedApplications.ToString("00,00")</p>
+            </div>
+            <div class="col-md-3 text-center alert btn-warning">
+                <h5>Total Bidder</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalBidders.ToString("00,00")</p>
+            </div>
+            <div class="col-md-3 text-center alert btn-warning col-md-offset-1">
+                <h5>Total Active Series</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalActiveSeries</p>
+            </div>
+            <div class="col-md-3 text-center alert btn-success">
+                <h5>Total No. Sold</h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalNumberSold.ToString("00,00") <strong>(out of @Model.totalCounters.SingleOrDefault().TotalNumbers.ToString("00,00"))</strong></p>
+            </div>
+            <div class="col-md-3 text-center alert btn-info">
+                <h5> Total Revenue <small style="color:white;">Rs.</small></h5>
+                <p>@Model.totalCounters.SingleOrDefault().TotalRevenue.ToString("00,00")</p>
+            </div>
+            <br />
+            <div class="col-md-5">
+                <h3 class="text-center">Revenue </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Series</th>
+                            <th>Revenue</th>
+                        </tr>
+                        @foreach (var item in Model.TopTenRevenueSeries)
+                        {
+                            <tr>
+                                <td>
+                                    @item.SeriesName
+                                </td>
+                                <td>
+                                    Rs/- @item.Revenue.ToString("00,00")
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.TopTenRevenueSeries.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="2">No Record Found</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <h3 class="text-center">Application Against Series </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Series</th>
+                            <th>Total Application</th>
+                            <th>Approved</th>
+                        </tr>
+                        @foreach (var item in Model.TopTenApplicationSeries)
+                        {
+                            <tr>
+                                <td style="text-align:left;">
+                                    @item.SeriesName
+                                </td>
+                                <td>
+                                    @item.TotalApplications
+                                </td>
+                                <td>
+                                    @item.Approved
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.TopTenApplicationSeries.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="3">No Record Found</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <br />
+            <br />
+            <div class="col-md-5">
+                <h3 class="text-center">Active Series </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Active Series</th>
+                            <th>Category</th>
+                        </tr>
+                        @foreach (var item in Model.SeriesCategoryList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.ActiveSeries
+                                </td>
+                                <td>
+                                    @item.Category
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.SeriesCategoryList.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="2">No Record Found</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <h3 class="text-center">Application Against Numbers </h3>
+                <div class="table-responsive" style="height:250px;">
+                    <table class="registration-table add other">
+                        <tr>
+                            <th>Series</th>
+                            <th>Number</th>
+                            <th>Total Application</th>
+                            <th>Approved</th>
+                        </tr>
+                        @foreach (var item in Model.TopTenApplicationsNumbers)
+                        {
+                            <tr>
+                                <td>
+                                    @item.SeriesName
+                                </td>
+                                <td>
+                                    @item.AuctionNumber
+                                </td>
+                                <td>
+                                    @item.TotalApplications
+                                </td>
+                                <td>
+                                    @item.Approved
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.TopTenApplicationsNumbers.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="4">No Record Found</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+

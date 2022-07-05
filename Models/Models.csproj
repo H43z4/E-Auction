@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Domain\Identity\CustomUserStore.cs" />
+    <Compile Remove="Domain\Identity\RoleDistrict.cs" />
+    <Compile Remove="Domain\Identity\RolePrivelge.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.3" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
+    <!--<PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.3" />-->
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.3" />
+  </ItemGroup>
+
+</Project>

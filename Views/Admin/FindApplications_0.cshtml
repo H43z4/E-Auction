@@ -1,0 +1,100 @@
+﻿@model IEnumerable<Models.Views.Auction.Application>
+
+@{
+    ViewData["Title"] = "Bidding Applications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts
+{
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("input[name=searchBtn]").click(function () {
+
+                $.ajax({
+                    url: "/Admin/FindApplications",
+                    data: { ApplicationStatusId: $("#applicationStatusId").val(), AIN: $("#AIN").val() },
+                    success: function (response) {
+                        $("div.table-responsive").html(response);
+                    },
+                    failure: function (response) {
+                        swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>Customers' Applications</h1>
+
+        @*<div class="alert alert-info" role="alert">
+            
+        </div>
+        <div class="auction-block">
+        </div>*@
+
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-3 push-right">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse1">Search</a>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-4">Status</label>
+                                    <div class="col-md-8">
+                                        <select id="applicationStatusId" asp-items="ViewBag.ApplicationStatus"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-4">AIN</label>
+                                    <div class="col-md-8">
+                                        <input type="text" id="AIN" name="AIN" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <input type="button" class="btn btn-sm btn-default" name="searchBtn" value="Search" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-3"></div>
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        @*<h1>Bidding Applications</h1>*@
+        <div class="auction-block">
+            <div class="table-responsive">
+                <partial name="_Applications" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="eauctionProductionDataSet" targetNamespace="http://tempuri.org/eauctionProductionDataSet.xsd" xmlns:mstns="http://tempuri.org/eauctionProductionDataSet.xsd" xmlns="http://tempuri.org/eauctionProductionDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="eauctionProductionConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="eauctionProductionConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.dotNetReports.Properties.Settings.GlobalReference.Default.eauctionProductionConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="eauctionProductionDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="eauctionProductionDataSet" msprop:Generator_UserDSName="eauctionProductionDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Winners" msprop:Generator_TableClassName="WinnersDataTable" msprop:Generator_TableVarName="tableWinners" msprop:Generator_TablePropName="Winners" msprop:Generator_RowDeletingName="WinnersRowDeleting" msprop:Generator_RowChangingName="WinnersRowChanging" msprop:Generator_RowEvHandlerName="WinnersRowChangeEventHandler" msprop:Generator_RowDeletedName="WinnersRowDeleted" msprop:Generator_UserTableName="Winners" msprop:Generator_RowChangedName="WinnersRowChanged" msprop:Generator_RowEvArgName="WinnersRowChangeEvent" msprop:Generator_RowClassName="WinnersRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SeriesCategory" msprop:Generator_ColumnVarNameInTable="columnSeriesCategory" msprop:Generator_ColumnPropNameInRow="SeriesCategory" msprop:Generator_ColumnPropNameInTable="SeriesCategoryColumn" msprop:Generator_UserColumnName="SeriesCategory">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Series" msprop:Generator_ColumnVarNameInTable="columnSeries" msprop:Generator_ColumnPropNameInRow="Series" msprop:Generator_ColumnPropNameInTable="SeriesColumn" msprop:Generator_UserColumnName="Series" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SeriesNumber" msprop:Generator_ColumnVarNameInTable="columnSeriesNumber" msprop:Generator_ColumnPropNameInRow="SeriesNumber" msprop:Generator_ColumnPropNameInTable="SeriesNumberColumn" msprop:Generator_UserColumnName="SeriesNumber" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="450" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ReservePrice" msprop:Generator_ColumnVarNameInTable="columnReservePrice" msprop:Generator_ColumnPropNameInRow="ReservePrice" msprop:Generator_ColumnPropNameInTable="ReservePriceColumn" msprop:Generator_UserColumnName="ReservePrice" type="xs:int" />
+              <xs:element name="HighestBiddingPrice" msprop:Generator_ColumnVarNameInTable="columnHighestBiddingPrice" msprop:Generator_ColumnPropNameInRow="HighestBiddingPrice" msprop:Generator_ColumnPropNameInTable="HighestBiddingPriceColumn" msprop:Generator_UserColumnName="HighestBiddingPrice" type="xs:int" minOccurs="0" />
+              <xs:element name="WinnerAIN" msprop:Generator_ColumnVarNameInTable="columnWinnerAIN" msprop:Generator_ColumnPropNameInRow="WinnerAIN" msprop:Generator_ColumnPropNameInTable="WinnerAINColumn" msprop:Generator_UserColumnName="WinnerAIN" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Approvals" msprop:Generator_TableClassName="ApprovalsDataTable" msprop:Generator_TableVarName="tableApprovals" msprop:Generator_TablePropName="Approvals" msprop:Generator_RowDeletingName="ApprovalsRowDeleting" msprop:Generator_RowChangingName="ApprovalsRowChanging" msprop:Generator_RowEvHandlerName="ApprovalsRowChangeEventHandler" msprop:Generator_RowDeletedName="ApprovalsRowDeleted" msprop:Generator_UserTableName="Approvals" msprop:Generator_RowChangedName="ApprovalsRowChanged" msprop:Generator_RowEvArgName="ApprovalsRowChangeEvent" msprop:Generator_RowClassName="ApprovalsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SeriesCategory" msprop:Generator_ColumnVarNameInTable="columnSeriesCategory" msprop:Generator_ColumnPropNameInRow="SeriesCategory" msprop:Generator_ColumnPropNameInTable="SeriesCategoryColumn" msprop:Generator_UserColumnName="SeriesCategory" type="xs:string" minOccurs="0" />
+              <xs:element name="SeriesName" msprop:Generator_ColumnVarNameInTable="columnSeriesName" msprop:Generator_ColumnPropNameInRow="SeriesName" msprop:Generator_ColumnPropNameInTable="SeriesNameColumn" msprop:Generator_UserColumnName="SeriesName" type="xs:string" minOccurs="0" />
+              <xs:element name="AuctionNumber" msprop:Generator_ColumnVarNameInTable="columnAuctionNumber" msprop:Generator_ColumnPropNameInRow="AuctionNumber" msprop:Generator_ColumnPropNameInTable="AuctionNumberColumn" msprop:Generator_UserColumnName="AuctionNumber" type="xs:string" minOccurs="0" />
+              <xs:element name="ReservePrice" msprop:Generator_ColumnVarNameInTable="columnReservePrice" msprop:Generator_ColumnPropNameInRow="ReservePrice" msprop:Generator_ColumnPropNameInTable="ReservePriceColumn" msprop:Generator_UserColumnName="ReservePrice" type="xs:int" minOccurs="0" />
+              <xs:element name="AIN" msprop:Generator_ColumnVarNameInTable="columnAIN" msprop:Generator_ColumnPropNameInRow="AIN" msprop:Generator_ColumnPropNameInTable="AINColumn" msprop:Generator_UserColumnName="AIN" type="xs:string" minOccurs="0" />
+              <xs:element name="MRA" msprop:Generator_ColumnVarNameInTable="columnMRA" msprop:Generator_ColumnPropNameInRow="MRA" msprop:Generator_ColumnPropNameInTable="MRAColumn" msprop:Generator_UserColumnName="MRA" type="xs:string" minOccurs="0" />
+              <xs:element name="CreatedOn" msprop:Generator_ColumnVarNameInTable="columnCreatedOn" msprop:Generator_ColumnPropNameInRow="CreatedOn" msprop:Generator_ColumnPropNameInTable="CreatedOnColumn" msprop:Generator_UserColumnName="CreatedOn" type="xs:string" minOccurs="0" />
+              <xs:element name="Count" msprop:Generator_ColumnVarNameInTable="columnCount" msprop:Generator_ColumnPropNameInRow="Count" msprop:Generator_ColumnPropNameInTable="CountColumn" msprop:Generator_UserColumnName="Count" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

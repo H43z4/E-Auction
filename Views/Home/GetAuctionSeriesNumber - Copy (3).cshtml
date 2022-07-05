@@ -1,0 +1,340 @@
+﻿@model IEnumerable<Models.Views.Auction.SeriesNumber>
+
+@{
+    ViewData["Title"] = "Auction Series Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+
+            if (charCode >= 65 && charCode <= 90 || charCode >= 97 && charCode <= 122 || charCode == 32)
+                return true;
+
+            return false;
+        }
+
+        $(document).ready(function () {
+
+            //$("input:checkbox").change(function () {
+            //    var checkedVals = $('input:checkbox:checked').map(function () {
+            //        return this.value;
+            //    }).get();
+
+            //$("selectedSeriesNumbersDiv").toggle();
+
+            $("input:checkbox").change(function () {
+
+                //$('#seriesNumbers tr').filter(':has(:checkbox:checked)').find('td').each(function () {
+                //    // this = td element
+                //});
+
+                $("#selectedSeriesNumbers tbody tr").each(function () {
+
+                    var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+
+                    var selectedRows = $('#seriesNumbers tr').filter(':has(:checkbox:checked)').find("input[name = seriesNumberId][value = " + seriesNumberId + "]");
+
+                    if (!selectedRows.length) {
+
+                        $(this).remove();
+                    }
+                });
+
+                //var selectedSeriesNumbers = $("#selectedSeriesNumbers tr").length - 1;  // less than header row
+
+                $('#seriesNumbers tr').filter(':has(:checkbox:checked)').each(function () {
+
+                    var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+
+                    var alreadySelectedRow = $("#selectedSeriesNumbers tbody tr td input[name=seriesNumberId][value=" + seriesNumberId + "]");
+
+                    if (!alreadySelectedRow.length) {
+
+                        // this = tr
+                        $tr = $(this).clone(false);
+
+                        $tr.find("td:nth-of-type(4)").find("input").css("display", "block");
+                        $tr.find("td:nth-of-type(5)").find("input").css("display", "block");
+                        $tr.find("td:first-child").remove();
+
+
+                        //$('td', $tr).each(function (i, v) {
+                        //    // If you need to iterate the TD's
+                        //    if (i == 3) {
+
+                        //        //$(this).find("input").attr("name", "seriesNumbers[" + selectedSeriesNumbers + "].seriesNumberId");
+                        //        var ele = $(this).find("input");
+                        //        $(this).find("input").css("display", "block");
+                        //    }
+
+                        //    if (i == 0)
+                        //        $(this).remove();
+                        //});
+
+                        //get row values
+                        $('#selectedSeriesNumbers tbody').append($tr);
+                    }
+                });
+            });
+
+            $('#btnNext').click(function (event) {
+
+                event.preventDefault();
+
+                var data = new Array();
+
+                var isDataValid = true;
+
+                $("#selectedSeriesNumbers tbody tr").each(function () {
+
+                    var seriesNumberId = $(this).find('input[name=seriesNumberId]').val();
+                    var chasisNumber = $(this).find('input[name=chasisNumber]').val();
+                    var ownerName = $(this).find('input[name=ownerName]').val();
+
+                    if (!chasisNumber.length || !ownerName.length) {    //string.length
+
+                        isDataValid = false;
+                        return false;
+                    }
+
+                    data.push({
+
+                        id: parseInt(seriesNumberId),
+                        chasisNumber: chasisNumber,
+                        ownerName: ownerName
+                    });
+                });
+
+                if (!isDataValid) {
+
+                    swal("Error!", "Chassis Number(s) and owner name(s) required.", "error");
+                    return;
+                }
+
+
+                if (!data.length) {
+
+                    swal("Error!", "Select an auction No.", "error");
+                    return;
+                }
+
+
+                callAjaxMethod(data);
+            });
+
+            function callAjaxMethod(data) {
+
+                swal({
+                    title: "Are You Sure?",
+                    text: "Are you sure to apply for the selected Registration Mark(s) of Choice?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true,
+                },
+
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            $("#loader").toggle();
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/Home/SaveApplications",
+                                contentType: "application/json; charset=utf-8",
+                                //data: data,
+                                data: JSON.stringify(data),
+                                dataType: "json",
+                                success: function (response) {
+                                    if (response.status) {
+
+                                        window.location.href = "GetApplications";
+                                    }
+                                    else {
+                                        swal("Error!", response.msg, "error");
+                                    }
+                                },
+                                failure: function (response) {
+                                    swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                                }
+                            })
+                                .done(function () {
+
+                                    $("#loader").toggle();
+                                });
+                        }
+                        else {
+                            swal("Cancelled", "Your imaginary file is safe :)", "error");
+                        }
+                    });
+
+            }
+
+            $("#seriesNumbers tbody").addClass("search");
+
+            var filterResolve = function () {
+
+                var val = $(this).val().replace(/[^0-9]/g, '');
+
+                $(this).val(val);
+
+                if (val === "") {
+
+                    $('.search tr ').show();
+                    $("#not_match_found").hide();
+
+                    return;
+                }
+
+                //if ($(this).val().length > 0 && $(this).val().length < 3) {
+                if (val.length > 0 && val.length < 3) {
+
+                    return;
+                }
+
+                $('.search tr ').hide();
+
+                var rex = new RegExp($(this).val(), 'i');
+
+                var defer = $.Deferred();
+
+                promiseloader = defer.then(function (value) {
+                    return $("#loader").toggle();
+                });
+
+                promiseFilter = promiseloader.then(function (value) {
+
+                    $('.search tr ').filter(function (i, v) {
+                        var $t = $(this).children().eq(1);
+                        return rex.test($t.text());
+                    }).show();
+
+                });
+
+                promiseFilter.done(function (value) {
+
+                    var totalRows = $('#seriesNumbers tbody tr:visible').length;
+
+                    if (totalRows == 0) {
+
+                        $("#not_match_found").show();
+                    }
+                    else {
+
+                        $("#not_match_found").hide();
+                    }
+
+                    return $("#loader").toggle();
+                });
+
+                defer.resolve(5);
+
+            };
+
+            $('#filter').keyup(filterResolve);
+
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9" id="selectedSeriesNumbersDiv">
+    <div class="detail-block">
+        <h1> @ViewBag.series?.CategoryName [ @ViewBag.series?.SeriesName ] </h1>
+        <span class="text">Select Registration Mark Of Choice</span>
+        <div class="auction-block">
+
+            <div class="col-md-12">
+                <div class="col-md-4 pull-right">
+                    <input type="text" id="filter" class="form-control" placeholder="Search Registration Mark" />
+                    <br />
+                </div>
+            </div>
+            
+            <div class="col-md-12">
+                <div class="rgDataDiv" style="overflow-y:scroll;overflow-x: hidden;height: 300px;">
+
+                    <table class="registration-table" id="seriesNumbers">
+                        <thead>
+                            <tr>
+                                <th width="50">Select</th>
+                                <th width="50">Registration Mark</th>
+                                <th width="300">Reserve Price</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="not_match_found" style="display: none;">
+                                <td colspan="3">NO MATCH FOUND</td>
+                            </tr>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.CheckBox("selectedNumber", false, new { value = item.Id })
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.AuctionNumber)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ReservePrice)
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="chasisNumber" style="display:none;" />
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="ownerName" style="display:none;" onkeypress="return isNumberKey(this, event);" />
+                                        <input type="hidden" name="seriesNumberId" asp-for="@item.Id" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>            
+        </div>
+    </div>
+</div>
+
+<div class="col-md-3"></div>
+<div class="content-area col-md-9">
+    <div class="detail-block">
+        <h1 class="text-center">Selected Registration Mark of Choice</h1>
+        <p class="text-center">Please, enter the chassis No. and owner name of the vehicle for which you want to get the registration mark.</p>
+        <div class="auction-block">
+            <table class="registration-table add" id="selectedSeriesNumbers">
+                <thead>
+                    <tr>
+                        <th>Registration Mark</th>
+                        <th>Reserve Price</th>
+                        <th>Chassis Number</th>
+                        <th>Vehicle Owner Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <br />
+        <div class="login-form add">
+            <div class="buttons-holder">
+                <a id="btnBack" class="btn-login" asp-area="" asp-controller="Home" asp-action="GetAuctionSeries">Back</a>
+                <button class="btn-login" id="btnNext">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>

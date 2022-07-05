@@ -1,0 +1,58 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+        <h1>User Login</h1>
+        <br />
+        <div class="row">
+            <div class="col-sm-12 alert-success">
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+        </div>
+
+        <div class="login-form">
+            <div class="form-holder col-md-8">
+                <form id="account" method="post">
+                    <div class="field-holder">
+                        <label for="one">CNIC</label>
+                        <div class="input-holder">
+                            <input asp-for="Input.CNIC" class="form-control" data-inputmask="'mask': '99999-9999999-9'" />
+                            <span asp-validation-for="Input.CNIC" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="field-holder">
+                        <label for="two">Password</label>
+                        <div class="input-holder">
+                            <input asp-for="Input.Password" class="form-control" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="buttons-holder" style="padding: 0 0 0 0;">
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-login">Log in</button>
+                        </div>
+                        <div class="col-md-4">
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="btn-forget">Forgot your password?</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="btn-forget">Register as a new user</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="~/lib/jquery.inputmask 5.0.2/jquery.inputmask.min.js"></script>
+    <script src="~/lib/jquery.inputmask 5.0.2/bindings/inputmask.binding.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+}

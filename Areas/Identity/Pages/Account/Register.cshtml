@@ -1,0 +1,272 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Sign up";
+}
+
+<style type="text/css">
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    a:disabled {
+        background: #dddddd;
+    }
+</style>
+
+<div class="content-area col-sm-9" id="signupDiv">
+    <div class="detail-block">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script src="~/lib/jquery.inputmask 5.0.2/jquery.inputmask.min.js"></script>
+    <script src="~/lib/jquery.inputmask 5.0.2/bindings/inputmask.binding.js"></script>
+
+    <script type="text/javascript">
+
+        function isCharKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+
+            if (charCode >= 65 && charCode <= 90 || charCode >= 97 && charCode <= 122 || charCode == 32)
+            return true;
+
+            return false;
+        }
+
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+
+        $(document).ready(function () {
+
+            $('#chkAgree').prop('checked', false);
+            $('#btnNext').css('background-color', 'gray');
+
+            $('#btnNext').click(function (e) {
+
+                var val = $('#chkAgree').is(':checked');
+
+                if (val == false) {
+
+                    swal("Error!", "Please, accept the terms and confitions to move forward.", "error");
+                    e.preventDefault();
+                }
+            });
+
+
+            $('#chkAgree').click(function () {
+
+                var val = $('#chkAgree').is(':checked');
+
+                if (val == false) {
+
+                    $('#btnNext').css('background-color', 'gray');
+                }
+                else {
+
+                    $('#btnNext').css('background-color', 'rgb(71, 124, 153)');
+                }
+            })
+        });
+
+    </script>
+}
+
+<div class="content-area col-sm-9" id="signupDiv">
+    <div class="detail-block">
+
+        <ul class="nav nav-tabs" id="farmWaterSources">
+            <li class="active"><a data-toggle="tab" href="#listWaterSources" style="color:green;">Your Credentials</a></li>
+            <li><a data-toggle="tab" href="#editWaterSource" style="color:green;">Terms & Conditions</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="listWaterSources" class="tab-pane fade in active">
+
+                <div class="row">
+
+                    <br />
+                    <div class="container">
+                        <div class="col-sm-8 alert-success">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    </div>
+
+                    <div class="login-form">
+                        <div class="form-holder col-md-8">
+                            <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                                <div class="form-group">
+                                    <label asp-for="Input.Name"></label>
+                                    <input asp-for="Input.Name" class="form-control" onkeypress="return isCharKey(this, event);" />
+                                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Input.CNIC"></label>
+                                    <input asp-for="Input.CNIC" class="form-control" data-inputmask="'mask': '99999-9999999-9'" />
+                                    <span asp-validation-for="Input.CNIC" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Input.NTN"></label>
+                                    <input asp-for="Input.NTN" class="form-control" />
+                                    <span asp-validation-for="Input.NTN" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Input.Company"></label>
+                                    <input asp-for="Input.Company" class="form-control" />
+                                    <span asp-validation-for="Input.Company" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Input.PhoneNumber">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon" style="border: 2px solid #d2d2d2;">+92</span>
+                                        <input type="text" class="form-control" placeholder="3001234567" asp-for="Input.PhoneNumber" maxlength="10"  onkeypress="return isNumberKey(this, event);">
+                                    </div>
+                                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Input.Email"></label>
+                                    <input asp-for="Input.Email" class="form-control" placeholder="Abc@email.com"/>
+                                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Input.Password"></label><br /><small>(Must contain at least 8 characters, including upper/lower case and numbers.)</small>
+                                    <input asp-for="Input.Password" class="form-control" placeholder="Abcd@12345" />
+                                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Input.ConfirmPassword"></label>
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="Abcd@12345" />
+                                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                                </div>
+                                <p></p>
+                                <div class="agree-footer">
+                                    <div class="checkbox-holder">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="chkAgree" />
+                                                <label for="chkAgree">I have read and agree to the Terms & Conditions.</label>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="button-holder">
+                                        <button id="btnNext" class="btn-next">Register</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div id="editWaterSource" class="tab-pane fade">
+                <h1>Terms & Conditions</h1>
+                <ul>
+                    <ol class="procedure-list">
+                        <li>Attractive Registration Mark (s) of choice shall only be allotted through web-based E-Auction process in order to maximize public facilitation, ensure transparency of the process and boosting the government revenue.</li>
+                        <li>The following Marks have been designated as auction able Registration Marks, and the corresponding Minimum Reserve Price is mentioned against these registration marks in the table below. The availability of these Marks will be published on the E-Auction platform before each round of Auction. A Registration Mark of choice will not be allotted at a price below the corresponding Minimum Reserve Price.</li>
+
+                        <div class="table-holder add">
+                            <table class="registration-table add home">
+                                <tr>
+                                    <th class="one">Sr.</th>
+                                    <th class="two">Registration Marks </th>
+                                    @*<th class="three">Reserve Price</th>*@
+                                    <th class="four">Category</th>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <ol class="marks-list">
+                                            <li>Serial Mark 1 of the series of registration mark.</li>
+                                            <li>Serial Mark 7 or 786 of the series of registration mark.</li>
+                                            <li>Any other single digit Mark of the series of registration marks</li>
+                                        </ol>
+                                    </td>
+                                    <td>All</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>10,11,22,33,44,55,66,77,88,99, 111, 222, 333, 444, 555, 666, 777, 888, 999, 100, 200, 300, 400, 500, 600, 700, 800, 900.</td>
+                                    <td>Except for vehicles at Category</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>1000,2000,3000,4000,5000,6000, 7000,8000, 9000, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 9999, 1214, 1234, 1272, 1412, 1472, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5100, 5200, 5300, 5400, 5500, 5600, 5700, 5800, 5900, 6100, 6200, 6300, 6400, 6500, 6600, 6700, 6800, 6900, 7100, 7200, 7300, 7400, 7500, 7600, 7700, 7800, 7900, 8100, 8200, 8300, 8400, 8500, 8600, 8700, 8800, 8900, 9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 9900, </td>
+                                    <td>
+                                        <ol class="marks-list">
+                                            <li><span class="value">For Motorcycle &  Rickshaw</span></li>
+                                            <li><span class="value">For Commercial Vehicles</span></li>
+                                        </ol>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <li>E-Auction process will be held after due publicity.</li>
+                        <li>Any registration mark except those detailed above shall be issued to the motor vehicle owners who desire to obtain the same on “first come first serve basis” without sequence at any time during the currency of the series on payment of     Rs.2,000/- for four wheelers and Rs.200/- in respect of other vehicles.</li>
+                        <li>All left over registration marks in any auction proceedings shall be offered to the motorists on “first come first serve basis” on reserve price as indicated above for first three on-line auction proceedings or average price of last three auction proceedings afterwards, whichever is higher. However, un-allotted left over attractive registration marks shall be permanently blocked in computer database. After one month of the completion of the series by the officer notified by Director General, ET&NC, Punjab. </li>
+                        <li>
+                            No reserve price of any registration marks shall be charged from Government owned motor vehicles and motor vehicles owned by semi-Government/autonomous bodies and other organizations under the control of Federal or Provincial Government. However, <b>Registration Marks 1 to 9 and 786 will be issued by the following Committee constituted by the Chief Minister:</b>
+                            <ol>
+                                <li>Minister for Excise, Taxation & Narcotics Control, Punjab.</li>
+                                <li>
+                                    Chief Secretary, Govt. of the Punjab.
+                                </li>
+                                <li>
+                                    Secretary, Excise, Taxation & Narcotics Control Department, Punjab.
+
+                                </li>
+                            </ol>
+                        </li>
+                        <li>The auction proceedings may be conducted preferably one week prior to the start of the series.</li>
+                        <li>In case, the highest bidder of auction fails to deposit bid amount quoted, the amount of security deposited by him shall be forfeited.</li>
+                        <li>The reserve price and the amount of the highest bid quoted in auction proceedings is to be charged in addition to prescribed registration fee.</li>
+                        <li>The owner has neither any right nor it is lawful for him to display the registration mark allocated in auction merely on the ground of having deposited the auction money. The Mark is allowed to be displayed only after proper registration of the motor vehicle and issuance of valid registration certificate.</li>
+                        <li>The auctioned registration mark once allotted and registered shall not be transferable to any vehicle other than owned by AIN holder. </li>
+                        <li>The Director General Excise, Taxation & Narcotics Control Department may cancel any proceedings for auction of any particular Mark or series giving reasons. He shall also decide all matters relating to allotted attractive registration mark(s), on case to case basis, after examining the matter on merits</li>
+                        <li>The Motor Registering Authority concerned shall maintain record and forward summary of revenue collected through these attractive registration marks to the DG office.</li>
+                        <li>The Application of E-Auction will be web based over the internet and can be accessed from the Excise, Taxation and Narcotics Control WEBSITE.</li>
+                        <li>The applicant has provision to choose online the desired Registration Mark of choice from attractive Registration Marks grouped in above table or any other Mark of choice. </li>
+                        <li>If the application shows availability of desired registration Mark of choice in the series, then applicant can select that registration Mark of choice and deposit Rs.100/- as participation fee.</li>
+                        <li>Three days will be given for registration as bidder. Rs.100 will be non-refundable Registration/Participation fee. The bidder will have to provide his detail particulars including CNIC / NTN. The obtained registration mark will be allotted only to the vehicle owned by that Person/Firm/Company or being owner of the vehicle to be registered through transfer of ownership. </li>
+                        <li>Against one registered Automated Identification Number (AIN), only one Registration Mark of choice can be contested. </li>
+                        <li>For obtaining registration mark of choice for more than one vehicle the applicant has to register separately for each vehicle and obtain AIN. For example, if one applicant has four vehicles and wants a Registration Mark of choice for each of the four vehicles then the applicant will have to register on the website separately for each vehicle and obtain four different AIN’s. Thereafter the applicant can participate in the bidding process separately for each AIN.</li>
+                        <li>The registration window for registration as bidders will remain open for 3 days for registration and will remain open for 3 days from the start of E-Auction for bidding. This facility will be available on holidays also. Registration and auction will start from 8 am on respective date of start and close at 12 mid night of respective date of closing.</li>
+                        <li>The bidders will have to deposit Demand Draft equal to the amount of reserved price of desired Registration Mark within 02 days of the closing of registration date as bidders upon which AIN of the bidder will be approved by the officer designated by Excise, Taxation & Narcotics Control Department.  </li>
+                        <li>After approval of registration as bidder by designated officer, applicant will receive a system generated login ID and Password.</li>
+                        <li>Once registered successfully, applicant can participate in the bidding process using the login ID and Password.</li>
+                        <li>While bidding, the bidder can change the amount of bid by multiples of Rs.500/- only.</li>
+                        <li>Results will be system generated, and published for the public on the e-auction website at http://excise-punjab.gov.pk.</li>
+                        <li>The successful bidders will be required to deposit the total amount of successful bid within 03 working days from the date of declaration of result in the office of Motor Registering Authority concerned upon which demand draft will be returned upon which the allotment letter of the registration mark of choice will be handed over to the successful bidder. </li>
+                        <li>The validity of allotment letter will be for a period of 10 days for Registration of the vehicle from the date of closing of bidding or start of the respective series whichever is earlier. However, the Director, Excise and taxation concerned on examining the merits of application may condone delay in registration </li>
+                        <li>In case same amount is quoted by two or more bidders, the bidder who has quoted that amount first shall be declared successful bidder.</li>
+                        <li>In case of more than one applicant applying at Minimum Reserved Price and where no further incremental bid is made by any of these applicants, that Registration mark of choice will be allotted to the person who has quoted that amount first.</li>
+                        <li>If the successful bidder fails to deposit the amount of bid within the given time, then the reserve price deposited by him shall be forfeited and registration Mark will be cancelled.</li>
+                        <li>
+                            The reserve price deposited by the unsuccessful bidder/s will be refunded on completion of formalities.
+                        </li>
+                        <li>No interest shall be paid by the department on the reserve price deposited by the bidder.</li>
+                    </ol>
+                </ul>
+
+                <div class="notes-holder">
+                    <strong class="note">Disclaimer:</strong>
+                    <p>The Excise, Taxation &amp; Narcotics Control Department reserves the right to cancel the Bidding Process or Final Allocation of any particular Mark(s).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

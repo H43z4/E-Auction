@@ -1,0 +1,56 @@
+﻿@model Models.Views.Auction.SeriesStatusWise
+
+@{
+    ViewData["Title"] = "Default";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts
+{
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
+    <script src="~/lib/Custom/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("button[name=btnGetSeries]").click(function () {
+
+                $.ajax({
+                    url: "/Admin/GetAuctionSeries",
+                    data: { seriesStatusId: $("#seriesStatus").val()},
+                    success: function (response) {
+                        $("div.table-responsive").html(response);
+                    },
+                    failure: function (response) {
+                        swal("Request Error!", "Request Error , Please try again latter." + response, "error");
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<div class="content-area col-sm-9">
+    <div class="detail-block">
+
+        <h1>Available Series for Auctions </h1>
+        <br />
+
+        <div class="row">
+            <div class="col-md-4">
+                @Html.DropDownList("seriesStatus", Model.SeriesStatusSelectList, "All", new { @class = "form-control" })
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-sm btn-default" name="btnGetSeries">Search</button>
+            </div>
+        </div>
+        <div class="auction-block">
+            <br />
+
+            <div class="table-responsive">
+
+                <partial name="_AuctionSeries" for="Series" />
+
+            </div>
+        </div>
+    </div>
+</div>

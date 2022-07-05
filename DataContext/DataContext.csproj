@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200811042922_identityInsertOff.cs" />
+    <Compile Remove="Migrations\20200811042922_identityInsertOff.Designer.cs" />
+    <Compile Remove="Migrations\20200811044410_identityInsertOff.cs" />
+    <Compile Remove="Migrations\20200811044410_identityInsertOff.Designer.cs" />
+    <Compile Remove="Migrations\20200813080039_pushNotification.cs" />
+    <Compile Remove="Migrations\20200813080039_pushNotification.Designer.cs" />
+    <Compile Remove="Migrations\20200815092431_appSecurityDeposit.cs" />
+    <Compile Remove="Migrations\20200815092431_appSecurityDeposit.Designer.cs" />
+    <Compile Remove="Migrations\20200816181037_chasisNumber_NOT_NULL.cs" />
+    <Compile Remove="Migrations\20200816181037_chasisNumber_NOT_NULL.Designer.cs" />
+    <Compile Remove="Migrations\20200819075817_statusTableSetIdentityOff.cs" />
+    <Compile Remove="Migrations\20200819075817_statusTableSetIdentityOff.Designer.cs" />
+    <Compile Remove="Migrations\20200821065805_userIdentitySchema.cs" />
+    <Compile Remove="Migrations\20200821065805_userIdentitySchema.Designer.cs" />
+    <Compile Remove="Migrations\20200822210908_uniqueUserFields.cs" />
+    <Compile Remove="Migrations\20200822210908_uniqueUserFields.Designer.cs" />
+    <Compile Remove="Migrations\20200911085412_epayment.cs" />
+    <Compile Remove="Migrations\20200911085412_epayment.Designer.cs" />
+    <Compile Remove="Migrations\20200911085900_epayment.cs" />
+    <Compile Remove="Migrations\20200911085900_epayment.Designer.cs" />
+    <Compile Remove="Migrations\20200911112441_epayment.cs" />
+    <Compile Remove="Migrations\20200911112441_epayment.Designer.cs" />
+    <Compile Remove="Migrations\20200915105245_epayment.cs" />
+    <Compile Remove="Migrations\20200915105245_epayment.Designer.cs" />
+    <Compile Remove="Migrations\20220701124253__1.cs" />
+    <Compile Remove="Migrations\20220701124253__1.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Models\Models.csproj" />
+  </ItemGroup>
+
+</Project>
