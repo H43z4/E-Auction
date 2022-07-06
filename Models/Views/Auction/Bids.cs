@@ -29,6 +29,7 @@ namespace Models.Views.Auction
         public int SeriesNumberId { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
+        public DateTime ClosingTime { get; set; }
         public int HighestBiddingPrice { get; set; }
         public string AIN { get; set; }
     }

@@ -76,9 +76,9 @@ namespace eauction.Controllers.API
             });
         }
 
-        private Task BroadcastHighestBid(int customerId, int seriesNumberId, int highestBidPrice, string time)
+        private Task BroadcastHighestBid(int customerId, int seriesNumberId, int highestBidPrice, string timeStamp, long remainingTime)
         {
-            return this.notificationHub.Clients.All.SendAsync("ReceiveMessage", customerId, seriesNumberId, highestBidPrice, time);
+            return this.notificationHub.Clients.All.SendAsync("ReceiveMessage", customerId, seriesNumberId, highestBidPrice, timeStamp, remainingTime);
         }
 
         [HttpPost("GetAuctionSeries")]
@@ -245,80 +245,6 @@ namespace eauction.Controllers.API
                 {
                     status = true,
                     applications
-                }));
-            }
-            catch
-            {
-                return Task.FromResult(this.Error());
-            }
-        }
-
-        [HttpPost("GetChallan_000000000")]
-        public Task<JsonResult> GetChallan([FromBody]GenericParamtersList genericParamtersList)
-        {
-            try
-            {
-                DataSet ds = this.AuctionService.GetApplicationDetail(genericParamtersList.applicationId);
-
-                var application = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Application>(ds.Tables[0]).FirstOrDefault();
-
-                if (application != null)
-                {
-                    if (application.CustomerId != this.UserId || application.ApplicationStatusId != 1)
-                    {
-                        return Task.FromResult(new JsonResult(new
-                        {
-                            status = false,
-                            msg = "Invalid application."
-                        }));
-                    }
-
-                    var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/{application.AIN}.pdf";
-
-                    if (!System.IO.File.Exists(pdfFile))
-                    {
-                        var htmlFile = $"{this.webHostEnvironment.WebRootPath}/Reports/Template/challanForm.html";
-
-                        var html = System.IO.File.ReadAllText(htmlFile);
-
-                        var user = this.AuctionService.GetUser(this.UserId);
-
-                        html = html.Replace("@User", user.FullName)
-                            .Replace("@AIN", application.AIN);
-
-                        FileStream pdfDocFile;
-
-                        //using (FileStream htmlSource = System.IO.File.Open(htmlFile, FileMode.Open))
-                        using (FileStream pdfDest = System.IO.File.Open(pdfFile, FileMode.OpenOrCreate))
-                        {
-                            ConverterProperties converterProperties = new ConverterProperties();
-                            converterProperties.SetMediaDeviceDescription(new MediaDeviceDescription(MediaType.PRINT));
-
-                            //HtmlConverter.ConvertToPdf(htmlSource, pdfDest, converterProperties);
-                            HtmlConverter.ConvertToPdf(html, pdfDest, converterProperties);
-
-                            pdfDocFile = pdfDest;
-                        }
-                    }
-
-                    //// return resulted pdf document
-                    //FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-                    //fileResult.FileDownloadName = $"{application.AIN}.pdf";
-                    //return fileResult;
-
-                    var challanFormLink = $"{this.Request.Scheme}://{this.Request.Host.Value}{this.Request.PathBase.Value}/Reports/pdfFiles/{application.AIN}.pdf";
-
-                    return Task.FromResult(new JsonResult(new
-                    {
-                        status = true,
-                        challanFormLink
-                    }));
-                }
-
-                return Task.FromResult(new JsonResult(new
-                {
-                    status = false,
-                    msg = "Invalid application."
                 }));
             }
             catch
@@ -715,15 +641,16 @@ namespace eauction.Controllers.API
                     .FirstOrDefault(x => x.AIN == newBid.AIN);
 
                 //var time = Infrastructure.DateTimeTimeAgo.TimeAgo(highestBid.CreatedOn);
-                var time = highestBid.CreatedOn.ToString("dd-MM-yyyy HH:mm:ss:fff");
+                var timeStamp = highestBid.CreatedOn.ToString("dd-MM-yyyy HH:mm:ss:fff");
+                var remainingTime = (long)(highestBid.ClosingTime - DateTime.Now).TotalMilliseconds;
 
-                this.BroadcastHighestBid(this.UserId, highestBid.SeriesNumberId, highestBid.HighestBiddingPrice, time);
+                this.BroadcastHighestBid(this.UserId, highestBid.SeriesNumberId, highestBid.HighestBiddingPrice, timeStamp, remainingTime);
 
                 return Task.FromResult(new JsonResult(new
                 {
                     status = true,
                     highestBid.SeriesNumberId,
-                    msg = $"Your bid has successfully been submitted at {time}"
+                    msg = $"Your bid has successfully been submitted at {timeStamp}"
                 }));
             }
             catch (SqlException ex)

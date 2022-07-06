@@ -31,13 +31,13 @@
 
             var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
 
-            connection.on("ReceiveMessage", function (cusId, seriesNumberId, highestBidPrice, time) {
+            connection.on("ReceiveMessage", function (cusId, seriesNumberId, highestBidPrice, timeStamp, remainingTime) {
                 var highestPriceElement = document.getElementById(seriesNumberId + "_highestBiddingPriceId");
                 var timeBeforeHigestBidElement = document.getElementById(seriesNumberId + "_timeBeforeHigestBidId");
                 var bidderElement = document.getElementById(seriesNumberId + "_bidder");
 
                 highestPriceElement.innerHTML = highestBidPrice;
-                timeBeforeHigestBidElement.innerHTML = time;
+                timeBeforeHigestBidElement.innerHTML = timeStamp;
 
                 var customerId = $("#custId").val();
 
@@ -45,6 +45,10 @@
                     bidderElement.innerHTML = "Your bid";
                 else
                     bidderElement.innerHTML = "Other person";
+                     
+                var totalSeconds = parseInt(Math.floor(remainingTime / 1000));
+
+                resetCountDown(seriesNumberId, totalSeconds);
             });
 
             connection.onclose(function () {
@@ -60,12 +64,29 @@
 
             $(".countdown").each(function () {
 
-                var eleId = $(this).data("tag");
-                var time_seconds = parseInt($(this).data("seconds"));
+                    var eleId = $(this).data("tag");
+                    var time_seconds = parseInt($(this).data("seconds"));
+
+                    $('#countdown_' + eleId).timeTo({
+                        //time: time,
+                        seconds: time_seconds,
+                        displayDays: 2,
+                        theme: "black",
+                        displayCaptions: true,
+                        fontSize: 24,
+                        captionSize: 10,
+                        lang: 'en'
+                    }, function () {
+                        $("#" + eleId + "_newBidButtonId").remove();
+                        $('#countdown_' + eleId).html('Bid closed.');
+                    });
+                });
+
+            function resetCountDown(eleId, remainingTime) {
 
                 $('#countdown_' + eleId).timeTo({
                     //time: time,
-                    seconds: time_seconds,
+                    seconds: remainingTime,
                     displayDays: 2,
                     theme: "black",
                     displayCaptions: true,
@@ -76,8 +97,7 @@
                     $("#" + eleId + "_newBidButtonId").remove();
                     $('#countdown_' + eleId).html('Bid closed.');
                 });
-
-            });
+            }
 
             $(".btn-bid").on("click", function () {
 
@@ -150,7 +170,7 @@
 
                                     $(lastBiddingPriceElement).text(BidPrice);
                                     //$(timeBeforeLastBidElement).text("Just now");
-                                    $(timeBeforeLastBidElement).text(response.time);
+                                    $(timeBeforeLastBidElement).text(response.timeStamp);
 
                                     $("#JtxtBidPrice").val('');
                                     document.getElementById("lblPopUpMsg").innerHTML = "Bid Sucessfull.";

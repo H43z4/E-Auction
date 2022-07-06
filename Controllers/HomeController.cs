@@ -52,9 +52,9 @@ namespace eauction.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private Task BroadcastHighestBid(int customerId, int seriesNumberId, int highestBidPrice, string time)
+        private Task BroadcastHighestBid(int customerId, int seriesNumberId, int highestBidPrice, string timeStamp, long remainingTime)
         {
-            return this.notificationHub.Clients.All.SendAsync("ReceiveMessage", customerId, seriesNumberId, highestBidPrice, time);
+            return this.notificationHub.Clients.All.SendAsync("ReceiveMessage", customerId, seriesNumberId, highestBidPrice, timeStamp, remainingTime);
         }
 
         [AllowAnonymous]
@@ -463,15 +463,18 @@ namespace eauction.Controllers
                 .FirstOrDefault(x => x.AIN == newBid.AIN);
 
             //var time = Infrastructure.DateTimeTimeAgo.TimeAgo(highestBid.CreatedOn);
-            var time = highestBid.CreatedOn.ToString("dd-MM-yyyy HH:mm:ss:fff");
+            var timeStamp = highestBid.CreatedOn.ToString("dd-MM-yyyy HH:mm:ss:fff");
+            //var remainingTime = (int)(highestBid.ClosingTime - DateTime.Now).TotalSeconds;
+            var remainingTime = (long)(highestBid.ClosingTime - DateTime.Now).TotalMilliseconds;
 
-            this.BroadcastHighestBid(this.UserId, highestBid.SeriesNumberId, highestBid.HighestBiddingPrice, time);
+            this.BroadcastHighestBid(this.UserId, highestBid.SeriesNumberId, highestBid.HighestBiddingPrice, timeStamp, remainingTime);
 
             return Json(new 
             {   
                 status = true,
                 highestBid.SeriesNumberId,
-                time
+                timeStamp,
+                remainingTime
             });
         }
 
@@ -490,228 +493,6 @@ namespace eauction.Controllers
 
             var series = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Series>(ds.Tables[0])
                 .Select(x => new 
-                {
-                    x.Id,
-                    Name = $"{x.CategoryName} [{x.SeriesName}]"
-                });
-
-            ViewBag.SeriesClosedForBiddingSelectList = new SelectList(series, "Id", "Name");
-
-            return View(series);
-        }
-
-        //public IActionResult DownloadWinners(int seriesId)
-        //{
-        //    RazorEngine razorEngine = new RazorEngine();
-        //    //RazorEngineCompiledTemplate template = razorEngine.Compile("Hello @Model.Name");
-        //    var template = razorEngine.Compile("Hello @Model.Name");
-
-        //    string result = template.Run(new
-        //    {
-        //        Name = "Alex"
-        //    });
-
-        //    return Json(result);
-        //}
-
-        public IActionResult DownloadWinners_4(int seriesId)
-        {
-            DataSet ds = this.AuctionService.GetWinnersSeriesWise(seriesId);
-
-            var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(ds.Tables[0]);
-
-            if (winners.Count() > 0)
-            {
-                var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{seriesId}.pdf";
-
-                //if (!System.IO.File.Exists(pdfFile))
-                //{
-
-                //}
-                var htmlFile = $"{this.webHostEnvironment.WebRootPath}/Reports/Template/winners.html";
-
-                var html = System.IO.File.ReadAllText(htmlFile);
-
-                var winnerTable = string.Empty;
-                int row = 1;
-
-                foreach (var winner in winners)
-                {
-                    winnerTable += $"<tr><td>{row++}</td><td>{winner.SeriesNumber}</td><td>{winner.ReservePrice}</td><td>{winner.HighestBiddingPrice}</td><td>{winner.WinnerAIN}</td></tr>";
-                }
-
-                var winnerObj = winners.FirstOrDefault();
-
-                html = html.Replace("@Series", $"{winnerObj.SeriesCategory} [{winnerObj.Series}]");
-                html = html.Replace("@TABLE_BODY", winnerTable);
-
-                FileStream pdfDocFile;
-
-                //using (FileStream htmlSource = System.IO.File.Open(htmlFile, FileMode.Open))
-                using (FileStream pdfDest = System.IO.File.Open(pdfFile, FileMode.OpenOrCreate))
-                {
-                    ConverterProperties converterProperties = new ConverterProperties();
-                    converterProperties.SetMediaDeviceDescription(new MediaDeviceDescription(MediaType.ALL));
-
-                    //HtmlConverter.ConvertToPdf(htmlSource, pdfDest, converterProperties);
-                    HtmlConverter.ConvertToPdf(html, pdfDest, converterProperties);
-
-                    pdfDocFile = pdfDest;
-                }
-                //// return resulted pdf document
-                FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-                fileResult.FileDownloadName = $"{seriesId}.pdf";
-                return fileResult;
-            }
-
-            return BadRequest();
-        }
-
-        public IActionResult DownloadWinners_3(int seriesId)
-        {
-            var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{seriesId}.pdf";
-
-            //if (!System.IO.File.Exists(pdfFile))
-            //{
-
-            //}
-            var htmlFile = $"{this.webHostEnvironment.WebRootPath}/Reports/Template/winners.html";
-
-            var html = System.IO.File.ReadAllText(htmlFile);
-
-            var winnerTable = string.Empty;
-
-            FileStream pdfDocFile;
-
-            //using (FileStream htmlSource = System.IO.File.Open(htmlFile, FileMode.Open))
-            using (FileStream pdfDest = System.IO.File.Open(pdfFile, FileMode.OpenOrCreate))
-            {
-                ConverterProperties converterProperties = new ConverterProperties();
-                converterProperties.SetMediaDeviceDescription(new MediaDeviceDescription(MediaType.PRINT));
-
-                //HtmlConverter.ConvertToPdf(htmlSource, pdfDest, converterProperties);
-                HtmlConverter.ConvertToPdf(html, pdfDest, converterProperties);
-
-                pdfDocFile = pdfDest;
-            }
-            //// return resulted pdf document
-            FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-            fileResult.FileDownloadName = $"{seriesId}.pdf";
-            return fileResult;
-
-        }
-
-        public IActionResult DownloadWinners_5(int seriesId)
-        {
-            DataSet ds = this.AuctionService.GetWinnersSeriesWise(seriesId);
-
-
-            if (ds.Tables.Count > 0)
-            {
-                //var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{seriesId}.pdf";
-                var rdlcFile = $"{this.webHostEnvironment.WebRootPath}/Reports/Template/Winners/SeriesWinners.rdlc";
-
-                //if (!System.IO.File.Exists(pdfFile))
-                //{
-
-                //}
-
-                //Infrastructure.Convert.ToDataTable<Models.Views.Auction.Winners>(winners);
-
-                var bytes = new ReportGenerator().GenerateReport(rdlcFile, ds.Tables[0], ReportOutputFormat.pdf);
-
-                //var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(ds.Tables[0]);
-
-                //var bytes = new ReportGenerator().GenerateReport(rdlcFile, winners.ToList(), ReportOutputFormat.pdf);
-
-
-                //return File(customReport.GetReport(), customReport.MimeType);
-
-                //// return resulted pdf document
-                FileResult fileResult = new FileContentResult(bytes, "application/pdf");
-                fileResult.FileDownloadName = $"{seriesId}.pdf";
-                return fileResult;
-            }
-
-            return BadRequest();
-        }
-
-        //public IActionResult DownloadWinners_1(int seriesId)
-        //{
-        //    DataSet ds = this.AuctionService.GetWinnersSeriesWise(seriesId);
-
-        //    var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(ds.Tables[0]);
-
-        //    if (winners.Count() > 0)
-        //    {
-        //        var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{seriesId}.pdf";
-
-        //        if (!System.IO.File.Exists(pdfFile))
-        //        {
-        //            var htmlFile = $"{this.webHostEnvironment.WebRootPath}/Reports/Template/winners.html";
-
-        //            var html = System.IO.File.ReadAllText(htmlFile);
-
-        //            FileStream pdfDocFile;
-
-        //            //using (FileStream htmlSource = System.IO.File.Open(htmlFile, FileMode.Open))
-        //            using (FileStream pdfDest = System.IO.File.Open(pdfFile, FileMode.OpenOrCreate))
-        //            {
-        //                ConverterProperties converterProperties = new ConverterProperties();
-        //                converterProperties.SetMediaDeviceDescription(new MediaDeviceDescription(MediaType.PRINT));
-
-        //                //HtmlConverter.ConvertToPdf(htmlSource, pdfDest, converterProperties);
-        //                HtmlConverter.ConvertToPdf(html, pdfDest, converterProperties);
-
-        //                pdfDocFile = pdfDest;
-        //            }
-        //        }
-
-        //        //// return resulted pdf document
-        //        FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-        //        fileResult.FileDownloadName = $"{seriesId}.pdf";
-        //        return fileResult;
-        //    }
-
-        //    return BadRequest();
-        //}
-
-        public IActionResult DownloadWinners_x(int seriesId)
-        {
-            var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners{seriesId}.pdf";
-            
-            if (!System.IO.File.Exists(pdfFile))
-            {
-                //// return resulted pdf document
-                FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-                fileResult.FileDownloadName = $"{seriesId}.pdf";
-                return fileResult;
-            }
-
-            return BadRequest();
-        }
-
-        
-        public IActionResult DownloadWinners_6(int seriesId)
-        {
-            var pdfFile = $"{this.webHostEnvironment.WebRootPath}\\Reports\\pdfFiles\\Winners\\{seriesId}.pdf";
-
-            if (System.IO.File.Exists(pdfFile))
-            {
-                //// return resulted pdf document
-                FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-                fileResult.FileDownloadName = $"{seriesId}.pdf";
-                return fileResult;
-            }
-            else
-            {
-                //this.GeneratePdf(seriesId);
-            }
-
-            DataSet ds = this.AuctionService.GetSeriesClosedForBidding();
-
-            var series = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Series>(ds.Tables[0])
-                .Select(x => new
                 {
                     x.Id,
                     Name = $"{x.CategoryName} [{x.SeriesName}]"

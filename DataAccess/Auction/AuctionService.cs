@@ -290,7 +290,7 @@ namespace DataAccess.Auction
             sql[1] = new SqlParameter("@AIN", newBid.AIN);
             sql[2] = new SqlParameter("@BidPrice", newBid.BidPrice);
 
-            var ds = new Query.Execution(this.connectionString).Execute_DataSet("SaveBid", sql);
+            var ds = new Query.Execution(this.connectionString).Execute_DataSet("SaveBidExt", sql);
 
             return ds;
         }
@@ -624,32 +624,6 @@ namespace DataAccess.Auction
 
         public SqlException SqlException { get; set; }
 
-        public DataSet GetBids_0(int customerId)
-        {
-            try
-            {
-                SqlParameter[] sql = new SqlParameter[1];
-                sql[0] = new SqlParameter("@CustomerId", customerId);
-
-                var ds = new Query.Execution(this.connectionString).Execute_DataSet("GetBids", sql);
-
-                return ds;
-            }
-            catch (SqlException ex)
-            {
-                this.SqlException = ex;
-            }
-
-            return new DataSet();
-
-            //SqlParameter[] sql = new SqlParameter[1];
-            //sql[0] = new SqlParameter("@CustomerId", customerId);
-
-            //var ds = new Query.Execution(this.connectionString).Execute_DataSet("GetBids", sql);
-
-            //return ds;
-        }
-        
         public DataSet GetBids(int customerId, out string sqlException)
         {
             try
@@ -687,7 +661,7 @@ namespace DataAccess.Auction
                 SqlParameter[] sql = new SqlParameter[1];
                 sql[0] = new SqlParameter("@CustomerId", customerId);
 
-                var ds = new Query.Execution(this.connectionString).Execute_DataSet("GetBidsMultipleSeries", sql);
+                var ds = new Query.Execution(this.connectionString).Execute_DataSet("GetBidsMultipleSeriesExt", sql);
 
                 sqlException = string.Empty;
 
