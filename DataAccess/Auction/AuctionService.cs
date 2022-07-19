@@ -304,7 +304,7 @@ namespace DataAccess.Auction
                 sql[1] = new SqlParameter("@AIN", newBid.AIN);
                 sql[2] = new SqlParameter("@BidPrice", newBid.BidPrice);
 
-                var ds = new Query.Execution(this.connectionString).Execute_DataSet("SaveBid", sql);
+                var ds = new Query.Execution(this.connectionString).Execute_DataSet("SaveBidExt", sql);
 
                 sqlException = string.Empty;
                 

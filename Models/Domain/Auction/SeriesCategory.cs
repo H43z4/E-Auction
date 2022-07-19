@@ -12,5 +12,7 @@ namespace Models.Domain.Auction
         [StringLength(100)]
         [Required]
         public string Name { get; set; }
+
+        public int MinBidMultiple { get; set; }
     }
 }

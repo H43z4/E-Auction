@@ -26,6 +26,7 @@ namespace Models.Views.Auction
         public DateTime AuctionEndDateTime { get; set; }
         public DateTime RegStartDateTime { get; set; }
         public DateTime RegEndDateTime { get; set; }
+        public bool IsReauctioning { get; set; }
         public bool IsActive { get; set; }
 
         public List<SeriesStatusHistory> SeriesStatusHistory { get; set; }

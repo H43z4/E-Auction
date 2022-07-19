@@ -164,7 +164,8 @@ namespace eauction.Controllers
                 {
                     Id = Convert.ToInt32(x["Id"].ToString()),
                     CategoryId = Convert.ToInt32(x["CategoryId"].ToString()),
-                    SeriesName = x["SeriesName"].ToString()
+                    SeriesName = x["SeriesName"].ToString(),
+                    AuctionEndDateTime = Convert.ToDateTime(x["AuctionEndDateTime"].ToString())
                 });
 
                 var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
@@ -190,6 +191,7 @@ namespace eauction.Controllers
                             IsAuctionable = true,
                             ReservePrice = item.ReservePrice,
                             SeriesId = series.Id,
+                            AuctionEndDateTime = series.AuctionEndDateTime
                         });
                     }
 

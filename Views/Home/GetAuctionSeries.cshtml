@@ -37,7 +37,7 @@
                         @{
                             int rowNum = 0;
                         }
-                        @foreach (var item in Model)
+                        @foreach (var item in Model.Where(x => x.IsReauctioning == false))
                         {
                             <tr>
                                 <td>@{ rowNum++; } @rowNum</td>
@@ -72,3 +72,58 @@
         </div>
     </div>
 </div>
+
+@if (Model.Any(x => x.IsReauctioning))
+{    <div class="content-area col-sm-9">
+        <div class="detail-block">
+            <h1>Available Series for <span style="color:red;">Re-Auction</span></h1>
+            <div class="auction-block">
+                <div class="table-responsive">
+
+                    <table class="table registration-table add other">
+                        <tr>
+                            <th></th>
+                            <th>Category</th>
+                            <th>Series</th>
+                            <th>Registration Start Date/Time</th>
+                            <th>Registration End Date/Time</th>
+                            <th>Auction Start Date/Time</th>
+                            <th>Auction End Date/Time</th>
+                            <th class="one"></th>
+                        </tr>
+                        @{
+                            int rowNum = 0;
+                        }
+                        @foreach (var item in Model.Where(x => x.IsReauctioning))
+                        {
+                            <tr>
+                                <td>@{ rowNum++; } @rowNum</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CategoryName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SeriesName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RegStartDateTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RegEndDateTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AuctionStartDateTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AuctionEndDateTime)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Select", "GetAuctionSeriesNumber", new { seriesId = item.Id }, htmlAttributes: new { @class = "btn-select" })
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
