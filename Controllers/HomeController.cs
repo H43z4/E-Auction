@@ -366,15 +366,6 @@ namespace eauction.Controllers
             });
         }
 
-        public IActionResult GetWinners_0()
-        {
-            DataSet ds = this.AuctionService.GetWinners(this.UserId);
-
-            var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(ds.Tables[0]);
-
-            return View(winners);
-        }
-
         public IActionResult GetWinners()
         {
             DataSet ds = this.AuctionService.GetSeriesClosedForBidding();

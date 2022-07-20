@@ -270,19 +270,6 @@ namespace DataAccess.Auction
             return result;
         }
 
-        public decimal SaveBid_v0(int customerId, NewBid newBid)
-        {
-            SqlParameter[] sql = new SqlParameter[3];
-            sql[0] = new SqlParameter("@CustomerId", customerId);
-            sql[1] = new SqlParameter("@AIN", newBid.AIN);
-            sql[2] = new SqlParameter("@BidPrice", newBid.BidPrice);
-
-            var id = new Query.Execution(this.connectionString).Execute_Scaler("SaveBid", sql);
-
-            //return (decimal)applicationId;
-            return 0;
-        }
-
         public DataSet SaveBid(int customerId, NewBid newBid)
         {
             SqlParameter[] sql = new SqlParameter[3];

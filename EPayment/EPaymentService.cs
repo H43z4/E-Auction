@@ -19,7 +19,7 @@ namespace EPayment
             this.ePayAPIs = ePayAPIs;
         }
 
-        public async Task<bool> AuthenticateAsync()
+        private async Task<bool> AuthenticateAsync()
         {
             try
             {
@@ -67,7 +67,7 @@ namespace EPayment
             }
         }
 
-        public async Task<Models.Views.EPay.ePayApplication> GetPSIdAsync(Models.Views.EPay.ePayApplication ePayApplication)
+        private async Task<Models.Views.EPay.ePayApplication> GetPSIdAsync(Models.Views.EPay.ePayApplication ePayApplication)
         {
             try
             {
