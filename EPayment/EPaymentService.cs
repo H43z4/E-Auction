@@ -100,7 +100,7 @@ namespace EPayment
                             {
                                 accountHeadName = ePayApplication.accountHeadName,
                                 accountNumber = ePayApplication.accountNumber,
-                                amountToTransfer = 100
+                                amountToTransfer = ePayApplication.amountToTransfer
                             }
                         }
                     };

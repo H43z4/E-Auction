@@ -1092,7 +1092,7 @@ namespace DataAccess.Auction
 
             return dataSet;
         }
-
+        
         public bool SaveWinnersToMvrs(string oraConnectionString, List<Winners> winners)
         {
             int size = winners.Count;
@@ -1160,6 +1160,37 @@ namespace DataAccess.Auction
             return true;
         }
 
+        public DataSet GetCreditFromMvrs(string oraConnectionString, string chassisNo)
+        {
+            var P_CHASIS_NO = new OracleParameter("P_CHASIS_NO", OracleDbType.Varchar2, chassisNo, ParameterDirection.Input);
+            var P_NUMBER = new OracleParameter("P_NUMBER", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            var command = new OracleConnection(oraConnectionString).CreateCommand();
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandText = $"MVRS.PKG_EMOTOR.GET_CREDIT_INFO";
+            command.Parameters.AddRange(new OracleParameter[]
+            {
+                    P_CHASIS_NO,
+                    P_NUMBER
+            });
+
+            DataSet dataSet = new DataSet("Results");
+            OracleDataAdapter oracleDataAdapter = new OracleDataAdapter(command);
+
+            if (command.Connection.State != ConnectionState.Open)
+            {
+                command.Connection.Open();
+            }
+
+            oracleDataAdapter.Fill(dataSet);
+
+            if (command.Connection.State == ConnectionState.Open)
+            {
+                command.Connection.Close();
+            }
+
+            return dataSet;
+        }
 
         #endregion
 

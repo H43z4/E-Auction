@@ -31,6 +31,7 @@ namespace eauction.Controllers
     {
         private readonly IHubContext<NotificationHub> notificationHub;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IConfiguration configuration;
 
         public HomeController(ILogger<HomeController> logger, 
             IConfiguration configuration, 
@@ -44,6 +45,7 @@ namespace eauction.Controllers
             //base(logger, configuration);
             this.notificationHub = hub;
             this.webHostEnvironment = env;
+            this.configuration = configuration;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -132,7 +134,7 @@ namespace eauction.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> SaveApplications([FromBody]List<Models.Views.Input.Application> applications)
+        public async Task<IActionResult> SaveApplications_0([FromBody]List<Models.Views.Input.Application> applications)
         {
             if (!ModelState.IsValid)
             {
@@ -181,6 +183,187 @@ namespace eauction.Controllers
                     OwnerName = "",
                     PSId = x.psId,
                     AmountPaid = 0,
+                    BankCode = "",
+                    PaidOn = DateTime.Now,
+                    PaymentStatusId = 0
+                })
+                    .ToList()
+                    .ToDataTable());
+            }
+            catch (SqlException ex)
+            {
+                return Json(new
+                {
+                    status = false,
+                    errCode = ex.Number,
+                    msg = ex.Message
+                });
+            }
+            catch
+            {
+                return Json(new
+                {
+                    status = false,
+                    errCode = 0
+                });
+            }
+
+            try
+            {
+                var user = this.AuctionService.GetUser(this.UserId);
+                var emailSetting = this.AuctionService.GetEmailSetting(3);
+
+
+                emailSetting.Body = emailSetting.Body.Replace("@@@", Environment.NewLine);
+                emailSetting.Receiver = user.Email;
+
+                await this.notificationManager.SendMessage(user.PhoneNumber, emailSetting);
+            }
+            catch
+            {
+            }
+
+            return Json(new
+            {
+                status = true,
+            });
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> SaveApplications([FromBody]List<Models.Views.Input.Application> applications)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new
+                {
+                    status = false,
+                    msg = string.Join("\n", ModelState.Values
+                                        .SelectMany(x => x.Errors)
+                                        .Select(x => x.ErrorMessage))
+                });
+            }
+
+            try
+            {
+                var credits = new Dictionary<string, int>();
+
+                //var taskCredits = Task.Factory.StartNew(() =>
+                //{
+                //    try
+                //    {
+                //        var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+
+
+                //        foreach (var app in applications)
+                //        {
+                //            var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
+
+                //            credits.Add(app.ChasisNumber, System.Convert.ToInt32(dsCredit.Tables[0].Rows[0].ToString()));
+                //        }
+                //    }
+                //    catch
+                //    {
+                //    }
+                //});
+
+                //var taskApplicationSaving = Task.Factory.StartNew(() => 
+                //{
+                //    var ds = this.AuctionService.SaveApplications(this.UserId, applications.Select(x => new
+                //    {
+                //        x.Id,
+                //        AIN = "",
+                //        ApplicationStatusId = 0,
+                //        x.ChasisNumber,
+                //        CustomerId = 0,
+                //        x.OwnerName,
+                //        PSId = "",
+                //        AmountPaid = 0,
+                //        BankCode = "",
+                //        PaidOn = DateTime.Now,
+                //        PaymentStatusId = 0
+                //    })
+                //        .ToList()
+                //        .ToDataTable());
+
+                //    return ds;
+                //});
+
+                //var tasks = new Task[2] { taskCredits, taskApplicationSaving };
+                //await Task.WhenAll(tasks);
+                //var ds = taskApplicationSaving.Result;
+
+                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+
+                foreach (var app in applications)
+                {
+                    var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
+
+                    if (dsCredit.Tables[0].Rows.Count == 0)
+                    {
+                        credits.Add(app.ChasisNumber, 0);
+                    }
+                    else
+                    { 
+                        credits.Add(app.ChasisNumber, System.Convert.ToInt32(dsCredit.Tables[0].Rows[0].ToString()));
+                    }
+                }
+
+                if (!credits.Any())
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var apps = applications.Join(credits, a => a.ChasisNumber, b => b.Key,
+                    (a, b) => new
+                    {
+                        a.Id,
+                        AIN = "",
+                        ApplicationStatusId = 0,
+                        a.ChasisNumber,
+                        CustomerId = 0,
+                        a.OwnerName,
+                        PSId = "",
+                        AmountPaid = 0,
+                        BankCode = "",
+                        PaidOn = DateTime.Now,
+                        PaymentStatusId = 0
+                    })
+                    .ToList();
+
+                var ds = this.AuctionService.SaveApplications(this.UserId, apps.ToDataTable());
+
+                var ePayAPIs = Infrastructure.DataTableExtension.DataTableToList<Models.Domain.EPay.ePayAPIs>(ds.Tables[0]).ToList();
+                var ePayApplications = Infrastructure.DataTableExtension.DataTableToList<Models.Views.EPay.ePayApplication>(ds.Tables[1]).ToList();
+
+                foreach (var app in ePayApplications)
+                {
+                    var reservePrice = System.Convert.ToInt32(app.amountToTransfer) - 100;
+                    var credit = credits.SingleOrDefault(x => x.Key == app.chassisNo).Value;
+
+                    if (reservePrice >= credit)
+                    {
+                        app.amountToTransfer = (reservePrice - credit + 100).ToString();
+                    }
+                    else
+                    {
+                        app.amountToTransfer = "100";
+                    }
+                }
+
+                EPayment.EPaymentService ePaymentService = new EPayment.EPaymentService(ePayAPIs);
+
+                var ePayApps = await ePaymentService.GeneratePSIdAsync(ePayApplications);
+
+                this.AuctionService.SavePSIds(ePayApps.Select(x => new
+                {
+                    Id = x.deptTransactionId,
+                    AIN = "",
+                    ApplicationStatusId = 0,
+                    ChasisNumber = "",
+                    CustomerId = 0,
+                    OwnerName = "",
+                    PSId = x.psId,
+                    AmountPaid = x.amountToTransfer,
                     BankCode = "",
                     PaidOn = DateTime.Now,
                     PaymentStatusId = 0
