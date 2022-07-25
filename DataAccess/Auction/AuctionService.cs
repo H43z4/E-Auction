@@ -205,7 +205,7 @@ namespace DataAccess.Auction
         {
             try
             {
-                SqlParameter[] sql = new SqlParameter[9];
+                SqlParameter[] sql = new SqlParameter[10];
                 sql[0] = new SqlParameter("@SeriesId", series.Id);
                 sql[1] = new SqlParameter("@SeriesCategoryId", series.CategoryId);
                 sql[2] = new SqlParameter("@SeriesName", series.SeriesName);
@@ -214,7 +214,8 @@ namespace DataAccess.Auction
                 sql[5] = new SqlParameter("@AuctionEndDateTime", series.AuctionEndDateTime);
                 sql[6] = new SqlParameter("@AuctionStartDateTime", series.AuctionStartDateTime);
                 sql[7] = new SqlParameter("@SeriesStatusId", series.SeriesStatusId);
-                sql[8] = new SqlParameter("@CreatedBy", userId);
+                sql[8] = new SqlParameter("@IsReauctioning", series.IsReauctioning);
+                sql[9] = new SqlParameter("@CreatedBy", userId);
 
                 var ds = new Query.Execution(this.connectionString).Execute_DataSet("SaveSeries", sql);
 
@@ -922,7 +923,7 @@ namespace DataAccess.Auction
         {
             SqlParameter[] sql = new SqlParameter[1];
             sql[0] = new SqlParameter("@ApplicationsCSVs", applications);
-            var dataset = new Query.Execution(this.connectionString).Execute_DataSet("ePay_GetPSIdInputModel", sql);
+            var dataset = new Query.Execution(this.connectionString).Execute_DataSet("ePay_GetPSIdInputModelExt", sql);
             return dataset;
         }
 

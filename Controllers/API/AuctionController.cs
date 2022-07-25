@@ -181,22 +181,22 @@ namespace eauction.Controllers.API
                     throw new InvalidOperationException();
                 }
 
-                var apps = applications.Join(credits, a => a.ChasisNumber, b => b.Key,
-                    (a, b) => new
-                    {
-                        a.Id,
-                        AIN = "",
-                        ApplicationStatusId = 0,
-                        a.ChasisNumber,
-                        CustomerId = 0,
-                        a.OwnerName,
-                        PSId = "",
-                        AmountPaid = 0,
-                        BankCode = "",
-                        PaidOn = DateTime.Now,
-                        PaymentStatusId = 0
-                    })
-                    .ToList();
+
+                var apps = applications.Select(x => new
+                {
+                    x.Id,
+                    AIN = "",
+                    ApplicationStatusId = 0,
+                    x.ChasisNumber,
+                    CustomerId = 0,
+                    x.OwnerName,
+                    PSId = "",
+                    AmountPaid = 0,
+                    BankCode = "",
+                    PaidOn = DateTime.Now,
+                    PaymentStatusId = 0
+                })
+                .ToList();
 
                 var ds = this.AuctionService.SaveApplications(this.UserId, apps.ToDataTable());
 
@@ -208,14 +208,6 @@ namespace eauction.Controllers.API
                     var reservePrice = System.Convert.ToInt32(app.amountToTransfer) - 100;
                     var credit = credits.SingleOrDefault(x => x.Key == app.chassisNo).Value;
 
-                    //if (reservePrice >= credit)
-                    //{
-                    //    app.amountToTransfer = (reservePrice - credit + 100).ToString();
-                    //}
-                    //else
-                    //{
-                    //    app.amountToTransfer = "100";
-                    //}
                     if (credit > 0 && credit <= reservePrice)
                     {
                         var amount = reservePrice - credit + 100;
@@ -870,7 +862,7 @@ namespace eauction.Controllers.API
         }
 
         [HttpPost("GetPSId")]
-        public async Task<IActionResult> GetPSId([FromBody]GenericParamtersList genericParamtersList)
+        public async Task<IActionResult> GetPSId([FromBody] GenericParamtersList genericParamtersList)
         {
             try
             {
@@ -878,6 +870,39 @@ namespace eauction.Controllers.API
 
                 var ePayAPIs = Infrastructure.DataTableExtension.DataTableToList<Models.Domain.EPay.ePayAPIs>(ds.Tables[0]).ToList();
                 var ePayApplications = Infrastructure.DataTableExtension.DataTableToList<Models.Views.EPay.ePayApplication>(ds.Tables[1]).ToList();
+
+                //////// GET CREDITS INFO /////////
+                ///
+
+                var app = ePayApplications.FirstOrDefault();
+
+                //var credits = new Dictionary<string, int>();
+                int credit = 0;
+
+                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+
+                var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.chassisNo);
+
+                if (dsCredit.Tables[0].Rows.Count > 0)
+                {
+                    credit = System.Convert.ToInt32(dsCredit.Tables[0].Rows[0][0].ToString());
+                }
+
+                //////// PUT CREDITS INFO IN APPS /////////
+
+                var reservePrice = System.Convert.ToInt32(app.amountToTransfer) - 100;
+
+                if (credit > 0 && credit <= reservePrice)
+                {
+                    var amount = reservePrice - credit + 100;
+                    app.amountToTransfer = amount.ToString();
+                    app.amountWithinDueDate = amount;
+                }
+                else if (credit > 0 && credit > reservePrice)
+                {
+                    app.amountToTransfer = "100";
+                    app.amountWithinDueDate = 100;
+                }
 
                 EPayment.EPaymentService ePaymentService = new EPayment.EPaymentService(ePayAPIs);
 
@@ -916,6 +941,53 @@ namespace eauction.Controllers.API
                 });
             }
         }
+
+        //public async Task<IActionResult> GetPSId([FromBody]GenericParamtersList genericParamtersList)
+        //{
+        //    try
+        //    {
+        //        var ds = this.AuctionService.GetPSIdInputModel(genericParamtersList.applicationId.ToString());
+
+        //        var ePayAPIs = Infrastructure.DataTableExtension.DataTableToList<Models.Domain.EPay.ePayAPIs>(ds.Tables[0]).ToList();
+        //        var ePayApplications = Infrastructure.DataTableExtension.DataTableToList<Models.Views.EPay.ePayApplication>(ds.Tables[1]).ToList();
+
+        //        EPayment.EPaymentService ePaymentService = new EPayment.EPaymentService(ePayAPIs);
+
+        //        var ePayApps = await ePaymentService.GeneratePSIdAsync(ePayApplications);
+
+        //        this.AuctionService.SavePSIds(ePayApps.Select(x => new
+        //        {
+        //            Id = x.deptTransactionId,
+        //            AIN = "",
+        //            ApplicationStatusId = 0,
+        //            ChasisNumber = "",
+        //            CustomerId = 0,
+        //            OwnerName = "",
+        //            PSId = x.psId,
+        //            AmountPaid = 0,
+        //            BankCode = "",
+        //            PaidOn = DateTime.Now,
+        //            PaymentStatusId = 0
+        //        })
+        //            .ToList()
+        //            .ToDataTable());
+
+
+        //        return new JsonResult(new
+        //        {
+        //            status = true,
+        //            psId = ePayApps.FirstOrDefault().psId
+        //        });
+        //    }
+        //    catch
+        //    {
+        //        return new JsonResult(new
+        //        {
+        //            status = false,
+        //            msg = "Try again."
+        //        });
+        //    }
+        //}
 
         #endregion
     }

@@ -94,7 +94,7 @@ namespace eauction.Areas.Identity.Pages.Account
                 // Once, UserName is changed _signInManager.PasswordSignInAsync cannot be used after password is changed.
                 ////////////////////////////////
 
-                var user = this._db.Users.SingleOrDefault(x => x.CNIC == Input.CNIC);
+                var user = this._db.Users.SingleOrDefault(x => x.CNIC == Input.CNIC && x.IsSoftDeleted != true);
 
                 if (user == null)
                 {
