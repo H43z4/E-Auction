@@ -963,6 +963,14 @@ namespace DataAccess.Auction
             }
         }
 
+        public DataSet GetPayeesInfo(long applicationId)
+        {
+            SqlParameter[] sql = new SqlParameter[1];
+            sql[0] = new SqlParameter("@ApplicationsId", applicationId);
+            var dataset = new Query.Execution(this.connectionString).Execute_DataSet("ePay_GetPayeesInfo", sql);
+            return dataset;
+        }
+
         #endregion
 
 
@@ -1190,6 +1198,69 @@ namespace DataAccess.Auction
             }
 
             return dataSet;
+        }
+
+        public int SavePaymentInfoToMvrs(string oraConnectionString, Models.Views.Payment.Payee payee, string PSId, Int64 amountPaid)
+        {
+            var P_CAT_CODE = new OracleParameter("P_CAT_CODE", OracleDbType.Varchar2, payee.Series, ParameterDirection.Input);
+            var P_NG_NUMBER = new OracleParameter("P_NG_NUMBER", OracleDbType.Varchar2, payee.SeriesNumber, ParameterDirection.Input);
+            var P_CAT_ID = new OracleParameter("P_CAT_ID", OracleDbType.Varchar2, payee.SeriesCategoryId, ParameterDirection.Input);
+            var P_CUST_NAME = new OracleParameter("P_CUST_NAME", OracleDbType.Varchar2, payee.Name, ParameterDirection.Input);
+            var P_CUST_CNIC = new OracleParameter("P_CUST_CNIC", OracleDbType.Varchar2, payee.CNIC, ParameterDirection.Input);
+            var P_CUST_PHONE = new OracleParameter("P_CUST_PHONE", OracleDbType.Varchar2, payee.PhoneNumber, ParameterDirection.Input);
+            var P_CUST_EMAIL = new OracleParameter("P_CUST_EMAIL", OracleDbType.Varchar2, payee.Email, ParameterDirection.Input);
+            var P_OWN_NAME = new OracleParameter("P_OWN_NAME", OracleDbType.Varchar2, payee.OwnerName, ParameterDirection.Input);
+            var P_OWN_CNIC = new OracleParameter("P_OWN_CNIC", OracleDbType.Varchar2, string.Empty, ParameterDirection.Input);
+            var P_AMOUNT = new OracleParameter("P_AMOUNT", OracleDbType.Int64, amountPaid, ParameterDirection.Input);
+            var P_RESERVE_PRICE = new OracleParameter("P_RESERVE_PRICE", OracleDbType.Int64, payee.ReservePrice, ParameterDirection.Input);
+            var P_CHASSIS_NO = new OracleParameter("P_CHASSIS_NO", OracleDbType.Varchar2, payee.ChasisNumber, ParameterDirection.Input);
+            var P_AUC_STATUS = new OracleParameter("P_AUC_STATUS", OracleDbType.Varchar2, string.Empty, ParameterDirection.Input);
+            var P_TAT_ID = new OracleParameter("P_TAT_ID", OracleDbType.Int16, 0, ParameterDirection.Input);
+            var P_PSID = new OracleParameter("P_PSID", OracleDbType.Varchar2, PSId, ParameterDirection.Input);
+            var P_REMARKS = new OracleParameter("P_REMARKS", OracleDbType.Varchar2, string.Empty, ParameterDirection.Input);
+            var P_RESULT = new OracleParameter("P_RESULT", OracleDbType.Int32, ParameterDirection.Output);
+
+            var command = new OracleConnection(oraConnectionString).CreateCommand();
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandText = $"MVRS.PKG_EMOTOR.PAYMENT_INTIMATION";
+            command.Parameters.AddRange(new OracleParameter[]
+            {
+                P_CAT_CODE,
+                P_NG_NUMBER,
+                P_CAT_ID,
+                P_CUST_NAME,
+                P_CUST_CNIC,
+                P_CUST_PHONE,
+                P_CUST_EMAIL,
+                P_OWN_NAME,
+                P_OWN_CNIC,
+                P_AMOUNT,
+                P_RESERVE_PRICE,
+                P_CHASSIS_NO,
+                P_AUC_STATUS,
+                P_TAT_ID,
+                P_PSID,
+                P_REMARKS,
+                P_RESULT
+            });
+
+            if (command.Connection.State != ConnectionState.Open)
+            {
+                command.Connection.Open();
+            }
+
+            command.ExecuteNonQuery();
+
+            if (command.Connection.State == ConnectionState.Open)
+            {
+                command.Connection.Close();
+            }
+
+            //return true;
+
+            //return System.Convert.ToDecimal(P_RESULT.Value) > 0;
+
+            return (int)(Oracle.ManagedDataAccess.Types.OracleDecimal)P_RESULT.Value.ToString();
         }
 
         #endregion

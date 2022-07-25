@@ -247,64 +247,23 @@ namespace eauction.Controllers
             {
                 var credits = new Dictionary<string, int>();
 
-                //var taskCredits = Task.Factory.StartNew(() =>
-                //{
-                //    try
-                //    {
-                //        var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
-
-
-                //        foreach (var app in applications)
-                //        {
-                //            var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
-
-                //            credits.Add(app.ChasisNumber, System.Convert.ToInt32(dsCredit.Tables[0].Rows[0].ToString()));
-                //        }
-                //    }
-                //    catch
-                //    {
-                //    }
-                //});
-
-                //var taskApplicationSaving = Task.Factory.StartNew(() => 
-                //{
-                //    var ds = this.AuctionService.SaveApplications(this.UserId, applications.Select(x => new
-                //    {
-                //        x.Id,
-                //        AIN = "",
-                //        ApplicationStatusId = 0,
-                //        x.ChasisNumber,
-                //        CustomerId = 0,
-                //        x.OwnerName,
-                //        PSId = "",
-                //        AmountPaid = 0,
-                //        BankCode = "",
-                //        PaidOn = DateTime.Now,
-                //        PaymentStatusId = 0
-                //    })
-                //        .ToList()
-                //        .ToDataTable());
-
-                //    return ds;
-                //});
-
-                //var tasks = new Task[2] { taskCredits, taskApplicationSaving };
-                //await Task.WhenAll(tasks);
-                //var ds = taskApplicationSaving.Result;
-
                 var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
 
                 foreach (var app in applications)
                 {
-                    var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
-
-                    if (dsCredit.Tables[0].Rows.Count == 0)
+                    if (!credits.Any(x => x.Key == app.ChasisNumber))
                     {
-                        credits.Add(app.ChasisNumber, 0);
-                    }
-                    else
-                    { 
-                        credits.Add(app.ChasisNumber, System.Convert.ToInt32(dsCredit.Tables[0].Rows[0].ToString()));
+                        var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
+
+                        if (dsCredit.Tables[0].Rows.Count == 0)
+                        {
+                            credits.Add(app.ChasisNumber, 0);
+                        }
+                        else
+                        {
+                            var credit = System.Convert.ToInt32(dsCredit.Tables[0].Rows[0][0].ToString());
+                            credits.Add(app.ChasisNumber, credit);
+                        }
                     }
                 }
 
@@ -340,13 +299,25 @@ namespace eauction.Controllers
                     var reservePrice = System.Convert.ToInt32(app.amountToTransfer) - 100;
                     var credit = credits.SingleOrDefault(x => x.Key == app.chassisNo).Value;
 
-                    if (reservePrice >= credit)
+                    //if (reservePrice >= credit)
+                    //{
+                    //    app.amountToTransfer = (reservePrice - credit + 100).ToString();
+                    //}
+                    //else
+                    //{
+                    //    app.amountToTransfer = "100";
+                    //}
+
+                    if (credit > 0 && credit <= reservePrice)
                     {
-                        app.amountToTransfer = (reservePrice - credit + 100).ToString();
+                        var amount = reservePrice - credit + 100;
+                        app.amountToTransfer = amount.ToString();
+                        app.amountWithinDueDate = amount;
                     }
-                    else
+                    else if (credit > 0 && credit > reservePrice)
                     {
                         app.amountToTransfer = "100";
+                        app.amountWithinDueDate = 100;
                     }
                 }
 
@@ -380,7 +351,7 @@ namespace eauction.Controllers
                     msg = ex.Message
                 });
             }
-            catch
+            catch (Exception ex)
             {
                 return Json(new
                 {

@@ -93,7 +93,7 @@ namespace EPayment
                         chassisNo = ePayApplication.chassisNo,
                         ownerName = ePayApplication.ownerName,
                         dueDate = ePayApplication.dueDate.ToString("yyyy-MM-dd"),
-                        amountWithinDueDate = ePayApplication.amountWithinDueDate,
+                        amountWithinDueDate = ePayApplication.amountToTransfer,
                         amountBifurcation = new [] 
                         {
                             new

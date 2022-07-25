@@ -101,7 +101,8 @@ namespace eauction.Controllers.API
                         x.RegEndDateTime,
                         x.RegStartDateTime,
                         x.SeriesName,
-                        x.SeriesStatus
+                        x.SeriesStatus,
+                        x.IsReauctioning
                     });
 
                 return Task.FromResult(new JsonResult(new
@@ -153,25 +154,80 @@ namespace eauction.Controllers.API
 
             try
             {
-                var ds = this.AuctionService.SaveApplications(this.UserId, applications.Select(x => new
+                var credits = new Dictionary<string, int>();
+
+                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+
+                foreach (var app in applications)
                 {
-                    x.Id,
-                    AIN = "",
-                    ApplicationStatusId = 0,
-                    x.ChasisNumber,
-                    CustomerId = 0,
-                    x.OwnerName,
-                    PSId = "",
-                    AmountPaid = 0,
-                    BankCode = "",
-                    PaidOn = DateTime.Now,
-                    PaymentStatusId = 0
-                })
-                                    .ToList()
-                                    .ToDataTable());
+                    if (!credits.Any(x => x.Key == app.ChasisNumber))
+                    {
+                        var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
+
+                        if (dsCredit.Tables[0].Rows.Count == 0)
+                        {
+                            credits.Add(app.ChasisNumber, 0);
+                        }
+                        else
+                        {
+                            var credit = System.Convert.ToInt32(dsCredit.Tables[0].Rows[0][0].ToString());
+                            credits.Add(app.ChasisNumber, credit);
+                        }
+                    }
+                }
+
+                if (!credits.Any())
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var apps = applications.Join(credits, a => a.ChasisNumber, b => b.Key,
+                    (a, b) => new
+                    {
+                        a.Id,
+                        AIN = "",
+                        ApplicationStatusId = 0,
+                        a.ChasisNumber,
+                        CustomerId = 0,
+                        a.OwnerName,
+                        PSId = "",
+                        AmountPaid = 0,
+                        BankCode = "",
+                        PaidOn = DateTime.Now,
+                        PaymentStatusId = 0
+                    })
+                    .ToList();
+
+                var ds = this.AuctionService.SaveApplications(this.UserId, apps.ToDataTable());
 
                 var ePayAPIs = Infrastructure.DataTableExtension.DataTableToList<Models.Domain.EPay.ePayAPIs>(ds.Tables[0]).ToList();
                 var ePayApplications = Infrastructure.DataTableExtension.DataTableToList<Models.Views.EPay.ePayApplication>(ds.Tables[1]).ToList();
+
+                foreach (var app in ePayApplications)
+                {
+                    var reservePrice = System.Convert.ToInt32(app.amountToTransfer) - 100;
+                    var credit = credits.SingleOrDefault(x => x.Key == app.chassisNo).Value;
+
+                    //if (reservePrice >= credit)
+                    //{
+                    //    app.amountToTransfer = (reservePrice - credit + 100).ToString();
+                    //}
+                    //else
+                    //{
+                    //    app.amountToTransfer = "100";
+                    //}
+                    if (credit > 0 && credit <= reservePrice)
+                    {
+                        var amount = reservePrice - credit + 100;
+                        app.amountToTransfer = amount.ToString();
+                        app.amountWithinDueDate = amount;
+                    }
+                    else if (credit > 0 && credit > reservePrice)
+                    {
+                        app.amountToTransfer = "100";
+                        app.amountWithinDueDate = 100;
+                    }
+                }
 
                 EPayment.EPaymentService ePaymentService = new EPayment.EPaymentService(ePayAPIs);
 
@@ -186,7 +242,7 @@ namespace eauction.Controllers.API
                     CustomerId = 0,
                     OwnerName = "",
                     PSId = x.psId,
-                    AmountPaid = 0,
+                    AmountPaid = x.amountToTransfer,
                     BankCode = "",
                     PaidOn = DateTime.Now,
                     PaymentStatusId = 0
@@ -619,67 +675,6 @@ namespace eauction.Controllers.API
             }
         }
 
-        public Task<JsonResult> DownloadWinners_0([FromBody]GenericParamtersList genericParamtersList)
-        {
-            try
-            {
-                DataSet ds = this.AuctionService.GetWinnersSeriesWise(genericParamtersList.seriesId);
-
-                var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(ds.Tables[0]);
-
-                if (winners.Count() > 0)
-                {
-                    var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{genericParamtersList.seriesId}.pdf";
-
-                    if (!System.IO.File.Exists(pdfFile))
-                    {
-                        var htmlFile = $"{this.webHostEnvironment.WebRootPath}/Reports/Template/winners.html";
-
-                        var html = System.IO.File.ReadAllText(htmlFile);
-
-                        //html = Engine.Razor.Run(html, typeof(List<Models.Views.Auction.Winners>), winners);
-
-                        FileStream pdfDocFile;
-
-                        //using (FileStream htmlSource = System.IO.File.Open(htmlFile, FileMode.Open))
-                        using (FileStream pdfDest = System.IO.File.Open(pdfFile, FileMode.OpenOrCreate))
-                        {
-                            ConverterProperties converterProperties = new ConverterProperties();
-                            converterProperties.SetMediaDeviceDescription(new MediaDeviceDescription(MediaType.PRINT));
-
-                            //HtmlConverter.ConvertToPdf(htmlSource, pdfDest, converterProperties);
-                            HtmlConverter.ConvertToPdf(html, pdfDest, converterProperties);
-
-                            pdfDocFile = pdfDest;
-                        }
-                    }
-
-                    //// return resulted pdf document
-                    //FileResult fileResult = new FileContentResult(System.IO.File.ReadAllBytes(pdfFile), "application/pdf");
-                    //fileResult.FileDownloadName = $"{application.AIN}.pdf";
-                    //return fileResult;
-
-                    var winnersLink = $"{this.Request.Scheme}://{this.Request.Host.Value}{this.Request.PathBase.Value}/Reports/pdfFiles/Winners/{genericParamtersList.seriesId}.pdf";
-
-                    return Task.FromResult(new JsonResult(new
-                    {
-                        status = true,
-                        winnersLink
-                    }));
-                }
-
-                return Task.FromResult(new JsonResult(new
-                {
-                    status = false,
-                    msg = "Not available."
-                }));
-            }
-            catch
-            {
-                return Task.FromResult(this.Error());
-            }
-        }
-
         [HttpPost("DownloadWinners")]
         public Task<JsonResult> DownloadWinners([FromBody]GenericParamtersList genericParamtersList)
         {
@@ -771,7 +766,6 @@ namespace eauction.Controllers.API
         }
 
 
-
         [HttpPost("GetSchedule")]
         public Task<JsonResult> GetSchedule()
         {
@@ -822,6 +816,21 @@ namespace eauction.Controllers.API
 
             try
             {
+                var ds = this.AuctionService.GetPayeesInfo(System.Convert.ToInt64(ePayStatusUpdate.deptTransactionId));
+
+                var payeesInfo = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Payment.Payee>(ds.Tables[0]).ToList();
+
+                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+
+                var amountPaid = System.Convert.ToInt64(ePayStatusUpdate.amountPaid) - 100;
+
+                var status = this.AuctionService.SavePaymentInfoToMvrs(oraConnectionString, payeesInfo.FirstOrDefault(), ePayStatusUpdate.psId, amountPaid);
+
+                if (status == 0)    // oracle error
+                {
+                    throw new InvalidOperationException();
+                }
+
                 string sqlException = string.Empty;
 
                 this.AuctionService.SavePSIdStatus(ePayStatusUpdate, out sqlException);
@@ -851,7 +860,12 @@ namespace eauction.Controllers.API
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(this.Error());
+                //return await Task.FromResult(this.Error());
+                return new JsonResult(new
+                {
+                    status = false,
+                    msg = ex.Message
+                });
             }
         }
 

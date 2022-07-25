@@ -312,10 +312,14 @@ namespace eauction.Controllers
             return RedirectToAction(nameof(GetApplicationDetail), new { applicationId = appSecurityDeposit.ApplicationId });
         }
 
-
+        /// <summary>
+        /// removed in new version
+        /// </summary>
+        /// <param name="application"></param>
+        /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public IActionResult SaveApplicationDetail(Models.Views.Auction.Application application)
+        private IActionResult SaveApplicationDetail(Models.Views.Auction.Application application)
         {
             string sqlException = string.Empty;
 
