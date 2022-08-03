@@ -539,7 +539,8 @@ namespace eauction.Controllers.API
                 }
 
                 var highestBid = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.HighestBid>(ds.Tables[0])
-                    .FirstOrDefault(x => x.AIN == newBid.AIN);
+                    //.FirstOrDefault(x => x.AIN == newBid.AIN);
+                    .FirstOrDefault();
 
                 //var time = Infrastructure.DateTimeTimeAgo.TimeAgo(highestBid.CreatedOn);
                 var timeStamp = highestBid.CreatedOn.ToString("dd-MM-yyyy HH:mm:ss:fff");
@@ -917,7 +918,7 @@ namespace eauction.Controllers.API
                     CustomerId = 0,
                     OwnerName = "",
                     PSId = x.psId,
-                    AmountPaid = 0,
+                    AmountPaid = x.amountWithinDueDate,
                     BankCode = "",
                     PaidOn = DateTime.Now,
                     PaymentStatusId = 0

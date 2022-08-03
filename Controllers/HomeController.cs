@@ -272,23 +272,6 @@ namespace eauction.Controllers
                     throw new InvalidOperationException();
                 }
 
-                //var apps = applications.Join(credits, a => a.ChasisNumber, b => b.Key,
-                //    (a, b) => new
-                //    {
-                //        a.Id,
-                //        AIN = "",
-                //        ApplicationStatusId = 0,
-                //        a.ChasisNumber,
-                //        CustomerId = 0,
-                //        a.OwnerName,
-                //        PSId = "",
-                //        AmountPaid = 0,
-                //        BankCode = "",
-                //        PaidOn = DateTime.Now,
-                //        PaymentStatusId = 0
-                //    })
-                //    .ToList();
-
                 var apps = applications.Select(x => new
                 {
                     x.Id,
@@ -316,15 +299,6 @@ namespace eauction.Controllers
                     var reservePrice = System.Convert.ToInt32(app.amountToTransfer) - 100;
                     var credit = credits.SingleOrDefault(x => x.Key == app.chassisNo).Value;
 
-                    //if (reservePrice >= credit)
-                    //{
-                    //    app.amountToTransfer = (reservePrice - credit + 100).ToString();
-                    //}
-                    //else
-                    //{
-                    //    app.amountToTransfer = "100";
-                    //}
-
                     if (credit > 0 && credit <= reservePrice)
                     {
                         var amount = reservePrice - credit + 100;
@@ -351,7 +325,7 @@ namespace eauction.Controllers
                     CustomerId = 0,
                     OwnerName = "",
                     PSId = x.psId,
-                    AmountPaid = x.amountToTransfer,
+                    AmountPaid = x.amountWithinDueDate,
                     BankCode = "",
                     PaidOn = DateTime.Now,
                     PaymentStatusId = 0
@@ -366,6 +340,12 @@ namespace eauction.Controllers
                     status = false,
                     errCode = ex.Number,
                     msg = ex.Message
+                });
+
+                return Json(new
+                {
+                    status = false,
+                    errCode = 0
                 });
             }
             catch (Exception ex)
@@ -519,7 +499,8 @@ namespace eauction.Controllers
             }
 
             var highestBid = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.HighestBid>(ds.Tables[0])
-                .FirstOrDefault(x => x.AIN == newBid.AIN);
+                    //.FirstOrDefault(x => x.AIN == newBid.AIN);
+                    .FirstOrDefault();
 
             //var time = Infrastructure.DateTimeTimeAgo.TimeAgo(highestBid.CreatedOn);
             var timeStamp = highestBid.CreatedOn.ToString("dd-MM-yyyy HH:mm:ss:fff");
@@ -704,7 +685,7 @@ namespace eauction.Controllers
                     CustomerId = 0,
                     OwnerName = "",
                     PSId = x.psId,
-                    AmountPaid = 0,
+                    AmountPaid = x.amountWithinDueDate,
                     BankCode = "",
                     PaidOn = DateTime.Now,
                     PaymentStatusId = 0
