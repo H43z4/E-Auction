@@ -80,7 +80,7 @@ namespace EPayment
 
                     var data = new 
                     {
-                        deptTransactionId = ePayApplication.deptTransactionId,
+                        deptTransactionId = ePayApplication.deptTransactionId.ToString(),
                         ain = ePayApplication.ain,
                         consumerName = ePayApplication.consumerName,
                         mobileNo = ePayApplication.mobileNo,
@@ -93,6 +93,7 @@ namespace EPayment
                         chassisNo = ePayApplication.chassisNo,
                         ownerName = ePayApplication.ownerName,
                         dueDate = ePayApplication.dueDate.ToString("yyyy-MM-dd"),
+                        expiryDateTime = ePayApplication.dueDate.ToString("yyyy-MM-dd HH:mm:ss"),
                         amountWithinDueDate = ePayApplication.amountToTransfer,
                         amountBifurcation = new [] 
                         {
@@ -131,8 +132,9 @@ namespace EPayment
             }
             catch (Exception ex)
             {
-                ePayApplication.psId = ex.Message;
-                return ePayApplication;
+                //ePayApplication.psId = ex.Message;
+                //return ePayApplication;
+                throw ex;
             }
         }
 

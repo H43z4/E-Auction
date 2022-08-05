@@ -339,7 +339,7 @@ namespace eauction.Controllers
                 {
                     status = false,
                     errCode = ex.Number,
-                    msg = ex.Message
+                    //msg = ex.Message
                 });
 
                 return Json(new
@@ -353,7 +353,8 @@ namespace eauction.Controllers
                 return Json(new
                 {
                     status = false,
-                    errCode = 0
+                    errCode = 0,
+                    //msg = ex.Message
                 });
             }
 
