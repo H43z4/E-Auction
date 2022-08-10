@@ -6,10 +6,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models.Domain.Auction
 {
-    public class Series : BaseModel
+    public class SeriesLogs : BaseModel
     {
         [Key]
-        public int Id { get; set; }
+        public int SeriesLogsId { get; set; }
+
+        [ForeignKey("Series")]
+        public int SeriesId { get; set; }
+        public virtual Series Series { get; set; }
 
         [ForeignKey("District")]
         public int DistrictId { get; set; }

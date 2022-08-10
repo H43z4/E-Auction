@@ -1,13 +1,11 @@
 ﻿using Models.Domain.Identity;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Models.Domain.Base
 {
-    public class UserModel
+    public class BaseModel
     {
         [ForeignKey("User")]
         public int CreatedBy { get; set; }
@@ -15,7 +13,13 @@ namespace Models.Domain.Base
 
         [Required]
         public DateTime CreatedOn { get; set; }
+        
+        [ForeignKey("Modifier")]
+        public int? ModifiedBy { get; set; }
+        public virtual User Modifier { get; set; }
+
+        public DateTime? ModifiedOn { get; set; }
 
         public bool? IsSoftDeleted { get; set; }
-    }    
+    }
 }

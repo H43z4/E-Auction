@@ -26,6 +26,12 @@ namespace EPayment
                 var response = false;
 
                 var api = this.ePayAPIs.FirstOrDefault(x => x.ApiName == "auth");
+                //ePayAPIs api = new ePayAPIs()
+                //{
+                //    RequestURL = "https://stagingapi.epay.punjab.gov.pk:8443/authentication/api/auth/authenticate",
+                //    ClientId = "WX95G2YDVEZ",
+                //    ClientSecretKey = "SJC4Z4EOA4TYN8LZ99KR+4VJ8QW5PL3OJXZ78V9R6-96DXHTB0XYXR9HVUS4FL"
+                //};
 
                 using (var httpClient = new HttpClient())
                 {

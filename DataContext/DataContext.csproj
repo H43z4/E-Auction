@@ -31,6 +31,14 @@
     <Compile Remove="Migrations\20200915105245_epayment.Designer.cs" />
     <Compile Remove="Migrations\20220701124253__1.cs" />
     <Compile Remove="Migrations\20220701124253__1.Designer.cs" />
+    <Compile Remove="Migrations\20220810102941__3.cs" />
+    <Compile Remove="Migrations\20220810102941__3.Designer.cs" />
+    <Compile Remove="Migrations\20220810103050__3.cs" />
+    <Compile Remove="Migrations\20220810103050__3.Designer.cs" />
+    <Compile Remove="Migrations\20220810103520__3.cs" />
+    <Compile Remove="Migrations\20220810103520__3.Designer.cs" />
+    <Compile Remove="Migrations\20220810103922__3.cs" />
+    <Compile Remove="Migrations\20220810103922__3.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

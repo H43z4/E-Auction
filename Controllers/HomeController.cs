@@ -706,7 +706,7 @@ namespace eauction.Controllers
                 return Json(new
                 {
                     status = false,
-                    msg = "Try again." + ex.Message
+                    msg = "Try again." // + ex.Message
                 });
             }
         }

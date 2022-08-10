@@ -570,48 +570,6 @@ namespace eauction.Controllers.API
             }
         }
 
-        [HttpPost("GetWinners")]
-        public Task<JsonResult> GetWinners()
-        {
-            try
-            {
-                //DataSet ds = this.AuctionService.GetWinners(this.UserId);
-
-                //var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(ds.Tables[0])
-                //    .ToList()
-                //    .Select(x => new
-                //        {
-                //            x.HighestBiddingPrice,
-                //            x.ReservePrice,
-                //            x.Series,
-                //            x.SeriesCategory,
-                //            x.SeriesNumber,
-                //            x.WinnerAIN,
-                //            x.YourAIN,
-                //            x.YourHighestBiddingPrice
-                //        });
-
-                return Task.FromResult(new JsonResult(new
-                {
-                    status = true,
-                    winners = new List<Models.Views.Auction.Winners>()
-                }));
-            }
-            catch (SqlException ex)
-            {
-                return Task.FromResult(new JsonResult(new
-                {
-                    status = false,
-                    errCode = ex.Number,
-                    msg = ex.Message
-                }));
-            }
-            catch
-            {
-                return Task.FromResult(this.Error());
-            }
-        }
-
         [HttpPost("GetNotifications")]
         public Task<JsonResult> GetNotifications()
         {

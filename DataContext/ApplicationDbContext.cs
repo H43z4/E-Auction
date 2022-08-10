@@ -32,6 +32,7 @@ namespace eauction.Data
         public DbSet<ApplicationStatus> ApplicationStatus { get; set; }
         public DbSet<ApplicationStatusHistory> ApplicationStatusHistory { get; set; }
         public DbSet<Series> Series { get; set; }
+        public DbSet<SeriesLogs> SeriesLogs { get; set; }
         public DbSet<SeriesCategory> SeriesCategory { get; set; }
         public DbSet<SeriesStatus> SeriesStatus { get; set; }
         public DbSet<SeriesStatusHistory> SeriesStatusHistory { get; set; }
