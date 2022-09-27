@@ -549,7 +549,9 @@ namespace eauction.Controllers
                         .OrderBy(x => x.SeriesNumber)
                         .ToList();
 
-                    this.GeneratePdf(seriesId, winners);
+                    var auctionEndDate = System.Convert.ToDateTime(ds1.Tables[1].Rows[0][0]).ToString("yyyy-MM-dd");
+
+                    this.GeneratePdf(seriesId, winners, auctionEndDate);
                 }
 
                 //// return resulted pdf document
@@ -572,7 +574,7 @@ namespace eauction.Controllers
             return View(series);
         }
         
-        void GeneratePdf(int seriesId, List<Models.Views.Auction.Winners> winners)
+        void GeneratePdf(int seriesId, List<Models.Views.Auction.Winners> winners, string auctionEndDate)
         {
             var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{seriesId}.pdf";
 
@@ -606,6 +608,7 @@ namespace eauction.Controllers
 
             html = html.Replace("@Series", $"{winnerObj.SeriesCategory} [{winnerObj.Series}]");
             html = html.Replace("@TABLE_BODY", winnerTableRowTemplate);
+            html = html.Replace("@AUCTION_END_DATE", auctionEndDate);
 
             FileStream pdfDocFile;
 

@@ -248,7 +248,7 @@ namespace eauction.Controllers
                 .Select(x => new
                 {
                     x.Id,
-                    Name = $"{x.CategoryName} [{x.SeriesName}]"
+                    Name = $"{x.CategoryName} [{x.SeriesName}] [{x.AuctionEndDateTime.ToString("yyyy-MM-dd")}]"
                 });
 
             ViewBag.SeriesClosedForBiddingSelectList = new SelectList(series, "Id", "Name");

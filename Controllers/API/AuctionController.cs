@@ -643,7 +643,9 @@ namespace eauction.Controllers.API
                         .OrderBy(x => x.SeriesNumber)
                         .ToList();
 
-                        this.GeneratePdf(genericParamtersList.seriesId, winners);
+                        var auctionEndDate = System.Convert.ToDateTime(ds1.Tables[1].Rows[0][0]).ToString("yyyy-MM-dd");
+
+                        this.GeneratePdf(genericParamtersList.seriesId, winners, auctionEndDate);
                     }
 
                     var winnersLink = $"{this.Request.Scheme}://{this.Request.Host.Value}{this.Request.PathBase.Value}/Reports/pdfFiles/Winners/{genericParamtersList.seriesId}.pdf";
@@ -667,7 +669,7 @@ namespace eauction.Controllers.API
             }
         }
 
-        void GeneratePdf(int seriesId, List<Models.Views.Auction.Winners> winners)
+        void GeneratePdf(int seriesId, List<Models.Views.Auction.Winners> winners, string auctionEndDate)
         {
             var pdfFile = $"{this.webHostEnvironment.WebRootPath}/Reports/pdfFiles/Winners/{seriesId}.pdf";
 
@@ -700,6 +702,7 @@ namespace eauction.Controllers.API
 
             html = html.Replace("@Series", $"{winnerObj.SeriesCategory} [{winnerObj.Series}]");
             html = html.Replace("@TABLE_BODY", winnerTableRowTemplate);
+            html = html.Replace("@AUCTION_END_DATE", auctionEndDate);
 
             FileStream pdfDocFile;
 
