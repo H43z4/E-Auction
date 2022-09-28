@@ -26,6 +26,11 @@ namespace DataAccess.Auction
             this.connectionString = _db.Database.GetDbConnection().ConnectionString;
         }
 
+        public AuctionService(string connectionString)
+        {
+            this.connectionString = connectionString;
+        }
+
         public DataSet GetLOVs()
         {
             var dataset = new Query.Execution(this.connectionString).Execute_DataSet("GetLOVs", null);

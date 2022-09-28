@@ -14,6 +14,7 @@ namespace eauction.Controllers
     public class BaseController : Controller
     {
         private readonly ILogger<BaseController> _logger;
+        IConfiguration configuration;
         //private readonly string connectionString;
         private readonly ApplicationDbContext applicationDbContext;
         //protected readonly ISmsSender smsSender;
@@ -49,6 +50,16 @@ namespace eauction.Controllers
             private set { }
         }
 
+        public AuctionService MvrsRevampService
+        {
+            get
+            {
+                return new AuctionService(this.configuration.GetConnectionString("MvrsRevamp"));
+            }
+
+            private set { }
+        }
+
         public VIPService VIPService
         {
             get
@@ -67,7 +78,7 @@ namespace eauction.Controllers
         public BaseController(ILogger<HomeController> logger, IConfiguration configuration, ApplicationDbContext applicationDbContext, INotificationManager notificationManager)
         {
             _logger = logger;
-            //this.configuration = configuration;
+            this.configuration = configuration;
             //this.connectionString = configuration.GetConnectionString("DefaultConnection");
             //this.auctionService = new AuctionService(this.applicationDbContext, this.connectionString);
 

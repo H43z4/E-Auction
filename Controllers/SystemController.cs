@@ -158,7 +158,7 @@ namespace eauction.Controllers
 
             try
             {
-                var seriesDataset = this.AuctionService.GetSeriesForDataTransfer();
+                var seriesDataset = this.MvrsRevampService.GetSeriesForDataTransfer();
 
                 var openingSeries = seriesDataset.Tables[0].AsEnumerable().Select(x => new
                 {
