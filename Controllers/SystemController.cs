@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Models.Domain.MobileApplication;
+using Models.Views.Auction;
 using Models.Views.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -158,7 +160,7 @@ namespace eauction.Controllers
 
             try
             {
-                var seriesDataset = this.MvrsRevampService.GetSeriesForDataTransfer();
+                var seriesDataset = this.AuctionService.GetSeriesForDataTransfer();
 
                 var openingSeries = seriesDataset.Tables[0].AsEnumerable().Select(x => new
                 {
@@ -203,6 +205,101 @@ namespace eauction.Controllers
             catch (Exception ex)
             {
                 return Task.FromResult(Json(new { status = false, msg = ex.Message }));
+            }
+        }
+
+        [AllowAnonymous]
+        public Task<JsonResult> GetSeriesNumbersFromRevampPool(string secret)
+        {
+            var mysecret = this.configuration.GetSection("JwtConfig:secret").Value;
+
+            if (secret != mysecret)
+            {
+                return Task.FromResult(Json(new { status = false, msg = -1 }));
+            }
+
+            try
+            {
+                var seriesDataset = this.AuctionService.GetSeriesForDataTransfer();
+
+                var openingSeries = seriesDataset.Tables[0].AsEnumerable().Select(x => new
+                {
+                    Id = Convert.ToInt32(x["Id"].ToString()),
+                    CategoryId = Convert.ToInt32(x["CategoryId"].ToString()),
+                    SeriesName = x["SeriesName"].ToString(),
+                    AuctionEndDateTime = Convert.ToDateTime(x["AuctionEndDateTime"].ToString())
+                });
+
+                //var RevampConnectionString = this.configuration.GetSection("ConnectionStrings:MVRSRevampConnection").Value;
+
+                foreach (var series in openingSeries)
+                {
+                    var ds = this.MvrsRevampService.GetSeriesNumbersFromRevampPool(series.CategoryId, series.SeriesName);
+
+                    var newSeriesNumbers = ds.Tables[0].AsEnumerable().Select(x => new
+                    {
+                        AuctionNumber = x["AUCTIONED_NUMBER"].ToString(),
+                        ReservePrice = Convert.ToInt32(x["AUCTION_PRICE"]),
+                    });
+
+                    var seriesNumbers = new List<Models.Domain.Auction.SeriesNumber>();
+
+                    foreach (var item in newSeriesNumbers.OrderBy(x => x.AuctionNumber))
+                    {
+                        seriesNumbers.Add(new Models.Domain.Auction.SeriesNumber()
+                        {
+                            AuctionNumber = item.AuctionNumber,
+                            CreatedBy = 121,
+                            IsAuctionable = true,
+                            ReservePrice = item.ReservePrice,
+                            SeriesId = series.Id,
+                            AuctionEndDateTime = series.AuctionEndDateTime
+                        });
+                    }
+
+                    this.AuctionService.SaveSeriesNumber(seriesNumbers);
+                }
+
+                return Task.FromResult(Json(new { status = true }));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(Json(new { status = false, msg = ex.Message }));
+            }
+        }
+
+        [HttpPost("GetCustomerCredit")]
+        public Task<JsonResult> GetCustomerCredit(string chassisNo)
+        {
+            var credits = new Dictionary<string, int>();
+            try
+            {
+                
+                var dataset = this.MvrsRevampService.GetCustomerCredit(chassisNo);
+                if (dataset.Tables[0].Rows.Count == 0)
+                {
+                    credits.Add(chassisNo, 0);
+                }
+                else
+                {
+                    var credit = System.Convert.ToInt32(dataset.Tables[0].Rows[0][0].ToString());
+                    credits.Add(chassisNo, credit);
+                }
+
+                return Task.FromResult(new JsonResult(new
+                {
+                    status = true,
+                    credits
+                }));
+            }
+            catch
+            {
+                credits.Add(chassisNo, 0);
+                return Task.FromResult(new JsonResult(new
+                {
+                    status = false,
+                    credits
+                }));
             }
         }
 

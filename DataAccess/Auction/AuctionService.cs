@@ -1106,7 +1106,26 @@ namespace DataAccess.Auction
 
             return dataSet;
         }
-        
+
+        public DataSet GetSeriesNumbersFromRevampPool(int catId, string seriesName)
+        {
+            SqlParameter[] sql = new SqlParameter[2];
+            sql[0] = new SqlParameter("@SeriesCategoryId", catId);
+            sql[1] = new SqlParameter("@SeriesName", seriesName);
+
+            var ds = new Query.Execution(this.connectionString).Execute_DataSet("SRNRPL.GetNumbersforAuction", sql);
+
+            return ds;
+        }
+        public DataSet GetCustomerCredit(string chassisNo)
+        {
+            SqlParameter[] sql = new SqlParameter[1];
+            sql[0] = new SqlParameter("@ChasisNo", chassisNo);
+            
+            var dataset = new Query.Execution(this.connectionString).Execute_DataSet("SRNRPL.GetEAuctionCustomerCredit", sql);
+
+            return dataset;
+        }
         public bool SaveWinnersToMvrs(string oraConnectionString, List<Winners> winners)
         {
             int size = winners.Count;
