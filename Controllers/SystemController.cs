@@ -249,7 +249,7 @@ namespace eauction.Controllers
                         seriesNumbers.Add(new Models.Domain.Auction.SeriesNumber()
                         {
                             AuctionNumber = item.AuctionNumber,
-                            CreatedBy = 121,
+                            CreatedBy = 1,
                             IsAuctionable = true,
                             ReservePrice = item.ReservePrice,
                             SeriesId = series.Id,
@@ -317,21 +317,23 @@ namespace eauction.Controllers
             
             var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(winnersDataSet.Tables[0]).ToList();
 
-            var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+            int createdBy = 1;
+
+            //var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
 
             try
             {
-                this.AuctionService.SaveWinnersToMvrs(oraConnectionString, winners);
+                this.MvrsRevampService.SaveAuctionResultsToMvrs(createdBy, winners);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
 
-            foreach (var series in winners.GroupBy(x => x.SeriesId).Select(x => x.Key))
-            { 
-                DataSet ds = this.AuctionService.ApproveWinnersList(series, 0);
-            }
+            //foreach (var series in winners.GroupBy(x => x.SeriesId).Select(x => x.Key))
+            //{ 
+            //    DataSet ds = this.AuctionService.ApproveWinnersList(series, 0);
+            //}
 
             return Task.FromResult(Json(new { status = true }));
         }

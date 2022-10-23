@@ -1121,11 +1121,27 @@ namespace DataAccess.Auction
         {
             SqlParameter[] sql = new SqlParameter[1];
             sql[0] = new SqlParameter("@ChasisNo", chassisNo);
-            
+
             var dataset = new Query.Execution(this.connectionString).Execute_DataSet("SRNRPL.GetEAuctionCustomerCredit", sql);
 
             return dataset;
         }
+
+        public DataSet SaveAuctionResultsToMvrs(int createdBy, List<Winners> winners)
+        {
+            
+            SqlParameter[] sql = new SqlParameter[2];
+            sql[0] = new SqlParameter("@CreatedBy", createdBy);
+            sql[1] = new SqlParameter("@AuctionResult", winners);
+            
+            var ds = new Query.Execution(this.connectionString).Execute_DataSet("SRNRPL.SaveAuctionResult", sql);
+
+            return ds;
+
+            
+        }
+
+        
         public bool SaveWinnersToMvrs(string oraConnectionString, List<Winners> winners)
         {
             int size = winners.Count;
@@ -1225,6 +1241,35 @@ namespace DataAccess.Auction
             return dataSet;
         }
 
+        public void SaveCustomerPaymentToMvrs(Models.Views.Payment.Payee payee, string PSId, Int64 amountPaid)
+        {
+            try
+            {
+                SqlParameter[] sql = new SqlParameter[12];
+
+                sql[0] = new SqlParameter("@SeriesCode", payee.Series);
+                sql[1] = new SqlParameter("@SeriesNumberName", payee.SeriesNumber);
+                sql[2] = new SqlParameter("@CategoryId", payee.SeriesCategoryId);
+                sql[3] = new SqlParameter("@ChassisNo", payee.ChasisNumber);
+                sql[4] = new SqlParameter("@Amount", amountPaid);
+                sql[5] = new SqlParameter("@PSID", PSId);
+                sql[6] = new SqlParameter("@bankCode", "BOP");
+                sql[7] = new SqlParameter("@OwnerName", payee.OwnerName);
+                sql[8] = new SqlParameter("@CNIC", payee.CNIC);
+                sql[9] = new SqlParameter("@NTN", payee.NTN);
+                sql[10] = new SqlParameter("@PaymentStatusId", 1); //Status Marked as "Credit"
+                sql[11] = new SqlParameter("@CreatedBy", 1);
+
+
+                var result = new Query.Execution(this.connectionString).Execute_Scaler("SRNRPL.SaveCustomerPaymentIntimation_EAuction", sql);
+
+             
+            }
+            catch (Exception ex)
+            {
+                //sqlException = ex.Message;
+            }
+        }
         public int SavePaymentInfoToMvrs(string oraConnectionString, Models.Views.Payment.Payee payee, string PSId, Int64 amountPaid)
         {
             var P_CAT_CODE = new OracleParameter("P_CAT_CODE", OracleDbType.Varchar2, payee.Series, ParameterDirection.Input);

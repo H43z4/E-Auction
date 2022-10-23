@@ -54,6 +54,16 @@ namespace eauction.Controllers.API
             private set { }
         }
 
+        public AuctionService MvrsRevampService
+        {
+            get
+            {
+                return new AuctionService(this.configuration.GetConnectionString("MvrsRevamp"));
+            }
+
+            private set { }
+        }
+
         public AuctionController(ApplicationDbContext applicationDbContext,
             IConfiguration configuration,
             IHubContext<NotificationHub> hub,
@@ -789,6 +799,70 @@ namespace eauction.Controllers.API
 
                 this.AuctionService.SavePSIdStatus(ePayStatusUpdate, out sqlException);
                 
+                if (!string.IsNullOrEmpty(sqlException))
+                {
+                    return await Task.FromResult(new JsonResult(new
+                    {
+                        status = false,
+                        msg = sqlException
+                    }));
+                }
+
+                return new JsonResult(new
+                {
+                    status = true,
+                    msg = "OK"
+                });
+            }
+            catch (SqlException ex)
+            {
+                return new JsonResult(new
+                {
+                    status = false,
+                    msg = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                //return await Task.FromResult(this.Error());
+                return new JsonResult(new
+                {
+                    status = false,
+                    msg = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("SavePaymentIntimation")]
+        public async Task<JsonResult> SaveCustomerPaymentStatus(ePayStatusUpdate ePayStatusUpdate)
+        {
+            if (!ModelState.IsValid)
+            {
+                var modelStateErrors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+
+                return new JsonResult(new
+                {
+                    status = false,
+                    msg = "Data validation failed.",
+                    errors = modelStateErrors
+                });
+            }
+
+            try
+            {
+                var ds = this.AuctionService.GetPayeesInfo(System.Convert.ToInt64(ePayStatusUpdate.deptTransactionId));
+
+                var payeesInfo = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Payment.Payee>(ds.Tables[0]).ToList();
+
+                var amountPaid = System.Convert.ToInt64(ePayStatusUpdate.amountPaid) - 100;
+
+                this.MvrsRevampService.SaveCustomerPaymentToMvrs(payeesInfo.FirstOrDefault(), ePayStatusUpdate.psId, amountPaid);
+
+                
+                string sqlException = string.Empty;
+
+                this.AuctionService.SavePSIdStatus(ePayStatusUpdate, out sqlException);
+
                 if (!string.IsNullOrEmpty(sqlException))
                 {
                     return await Task.FromResult(new JsonResult(new
