@@ -78,13 +78,22 @@ namespace eauction.Controllers
         {
             var dataset = this.AuctionService.GetAuctionSeries(seriesStatusId);
 
-            //if (dataset.Tables[0].Rows.Count == 0)
-            //{
-            //    return View(new Models.Views.Auction.Series());
-            //}
+            var auctionSeries = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Series>(dataset.Tables[0]).ToList();
+            var mvrsConnectionString = this.configuration.GetConnectionString("MvrsRevamp");
+            //var validAuctionSeries = auctionSeries;
 
-            var auctionSeries = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Series>(dataset.Tables[0]);
-
+            foreach (var item in auctionSeries)
+            {
+                var seriesName = item.SeriesName;
+                var seriesCatagoryId = item.CategoryId;
+                var validDataset = this.AuctionService.GetSeriesFromRevampSchedule(mvrsConnectionString,seriesName,seriesCatagoryId);
+                if (validDataset.Tables[0].Rows.Count == 0)
+                {
+                    auctionSeries = auctionSeries.Where(a=>a.SeriesName != seriesName && a.CategoryId == seriesCatagoryId).ToList();
+                    //validAuctionSeries.Remove(item);
+                }
+            }
+            //auctionSeries = validAuctionSeries;
             return View(auctionSeries);
         }
 
@@ -247,13 +256,14 @@ namespace eauction.Controllers
             {
                 var credits = new Dictionary<string, int>();
 
-                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
-
+                //var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+                var mvrsConnectionString = this.configuration.GetConnectionString("MvrsRevamp");
                 foreach (var app in applications)
                 {
                     if (!credits.Any(x => x.Key == app.ChasisNumber))
                     {
-                        var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
+                        //var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.ChasisNumber);
+                        var dsCredit = this.AuctionService.GetCreditFromMvrs(mvrsConnectionString, app.ChasisNumber);
 
                         if (dsCredit.Tables[0].Rows.Count == 0)
                         {
@@ -643,7 +653,7 @@ namespace eauction.Controllers
                 //var credits = new Dictionary<string, int>();
                 int credit = 0;
 
-                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+                var oraConnectionString = this.configuration.GetConnectionString("MvrsRevamp");
 
                 var dsCredit = this.AuctionService.GetCreditFromMvrs(oraConnectionString, app.chassisNo);
 

@@ -764,6 +764,7 @@ namespace eauction.Controllers.API
         #region EPayment
 
         [HttpPost("PaymentIntimation")]
+        //[AllowAnonymous]
         public async Task<JsonResult> SavePaymentStatus(ePayStatusUpdate ePayStatusUpdate)
         {
             if (!ModelState.IsValid)
@@ -784,7 +785,7 @@ namespace eauction.Controllers.API
 
                 var payeesInfo = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Payment.Payee>(ds.Tables[0]).ToList();
 
-                var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
+                var oraConnectionString = this.configuration.GetConnectionString("MvrsRevamp");
 
                 var amountPaid = System.Convert.ToInt64(ePayStatusUpdate.amountPaid) - 100;
 
@@ -834,6 +835,7 @@ namespace eauction.Controllers.API
         }
 
         [HttpPost("SavePaymentIntimation")]
+        //[AllowAnonymous]
         public async Task<JsonResult> SaveCustomerPaymentStatus(ePayStatusUpdate ePayStatusUpdate)
         {
             if (!ModelState.IsValid)
@@ -854,11 +856,13 @@ namespace eauction.Controllers.API
 
                 var payeesInfo = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Payment.Payee>(ds.Tables[0]).ToList();
 
+                var oraConnectionString = this.configuration.GetConnectionString("MvrsRevamp");
+
                 var amountPaid = System.Convert.ToInt64(ePayStatusUpdate.amountPaid) - 100;
 
-                this.MvrsRevampService.SaveCustomerPaymentToMvrs(payeesInfo.FirstOrDefault(), ePayStatusUpdate.psId, amountPaid);
+                this.MvrsRevampService.SaveCustomerPaymentToMvrs(oraConnectionString, payeesInfo.FirstOrDefault(), ePayStatusUpdate.psId, amountPaid);
 
-                
+
                 string sqlException = string.Empty;
 
                 this.AuctionService.SavePSIdStatus(ePayStatusUpdate, out sqlException);

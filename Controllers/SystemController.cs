@@ -302,7 +302,7 @@ namespace eauction.Controllers
                 }));
             }
         }
-
+        //[HttpPost]
         [AllowAnonymous]
         public Task<JsonResult> ApproveWinnersList(string secret)
         {
@@ -314,16 +314,16 @@ namespace eauction.Controllers
             }
 
             var winnersDataSet = this.AuctionService.GetWinnersBeforeApproval();
-            
-            var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(winnersDataSet.Tables[0]).ToList();
 
+            var winners = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.Winners>(winnersDataSet.Tables[0]).ToList();
+            var seriesAndCategory = Infrastructure.DataTableExtension.DataTableToList<Models.Views.Auction.SeriesUDT>(winnersDataSet.Tables[1]).ToList();
             int createdBy = 1;
 
             //var oraConnectionString = this.configuration.GetSection("MVRS:DefaultConnection").Value;
 
             try
             {
-                this.MvrsRevampService.SaveAuctionResultsToMvrs(createdBy, winners);
+                this.MvrsRevampService.SaveAuctionResultsToMvrs(createdBy, winners, seriesAndCategory);
             }
             catch (Exception ex)
             {

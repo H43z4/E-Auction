@@ -7,6 +7,7 @@ using Models.Domain.Mail;
 using Models.Domain.Notification;
 using Models.Views.Auction;
 using Models.Views.Input;
+using Newtonsoft.Json;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
@@ -1117,6 +1118,16 @@ namespace DataAccess.Auction
 
             return ds;
         }
+        public DataSet GetSeriesFromRevampSchedule(string connectionString, string seriesName, int catId)
+        {
+            SqlParameter[] sql = new SqlParameter[2];
+            sql[0] = new SqlParameter("@SeriesCategoryId", catId);
+            sql[1] = new SqlParameter("@SeriesName", seriesName);
+
+            var ds = new Query.Execution(connectionString).Execute_DataSet("SRNRPL.GetSeriesforAuction", sql);
+
+            return ds;
+        }
         public DataSet GetCustomerCredit(string chassisNo)
         {
             SqlParameter[] sql = new SqlParameter[1];
@@ -1126,14 +1137,60 @@ namespace DataAccess.Auction
 
             return dataset;
         }
+        //public DataSet GetCustomerCredit(string chassisNo)
+        //{
+        //    SqlParameter[] sql = new SqlParameter[1];
+        //    sql[0] = new SqlParameter("@ChasisNo", chassisNo);
 
-        public DataSet SaveAuctionResultsToMvrs(int createdBy, List<Winners> winners)
+        //    var dataset = new Query.Execution(this.connectionString).Execute_DataSet("SRNRPL.GetEAuctionCustomerCredit", sql);
+
+        //    return dataset;
+        //}
+
+        private DataTable ConvertToDataTable<T>(List<T> list)
         {
-            
-            SqlParameter[] sql = new SqlParameter[2];
+            var dataTable = new DataTable();
+
+            // Get the properties of the objects in the list
+            var properties = typeof(T).GetProperties();
+
+            // Add columns to the data table for each property
+            foreach (var property in properties)
+            {
+                dataTable.Columns.Add(property.Name, property.PropertyType);
+            }
+
+            // Add rows to the data table
+            foreach (var item in list)
+            {
+                var row = dataTable.NewRow();
+
+                // Set the value of each column to the value of the corresponding property
+                foreach (var property in properties)
+                {
+                    row[property.Name] = property.GetValue(item);
+                }
+
+                dataTable.Rows.Add(row);
+            }
+
+            return dataTable;
+        }
+
+        public DataSet SaveAuctionResultsToMvrs(int createdBy, List<Winners> winners, List<SeriesUDT> seriesAndCategories)
+        {
+
+            SqlParameter[] sql = new SqlParameter[3];
             sql[0] = new SqlParameter("@CreatedBy", createdBy);
-            sql[1] = new SqlParameter("@AuctionResult", winners);
+
+            sql[1] = new SqlParameter("@AuctionResult", SqlDbType.Structured);
+            sql[1].TypeName = "[SRNRPL].[udtAuctionResult1]";
+            sql[1].Value = ConvertToDataTable(winners);
             
+            sql[2] = new SqlParameter("@SeriesAndCategories", SqlDbType.Structured);
+            sql[2].TypeName = "[SRNRPL].[udtSeriesAndCategories]";
+            sql[2].Value = ConvertToDataTable(seriesAndCategories);
+
             var ds = new Query.Execution(this.connectionString).Execute_DataSet("SRNRPL.SaveAuctionResult", sql);
 
             return ds;
@@ -1209,39 +1266,47 @@ namespace DataAccess.Auction
             return true;
         }
 
-        public DataSet GetCreditFromMvrs(string oraConnectionString, string chassisNo)
+        public DataSet GetCreditFromMvrs(string mvrsConnectionString, string chassisNo)
         {
-            var P_CHASIS_NO = new OracleParameter("P_CHASIS_NO", OracleDbType.Varchar2, chassisNo, ParameterDirection.Input);
-            var P_NUMBER = new OracleParameter("P_NUMBER", OracleDbType.RefCursor, ParameterDirection.Output);
+            SqlParameter[] sql = new SqlParameter[1];
+            sql[0] = new SqlParameter("@ChasisNumber", chassisNo);
 
-            var command = new OracleConnection(oraConnectionString).CreateCommand();
-            command.CommandType = System.Data.CommandType.StoredProcedure;
-            command.CommandText = $"MVRS.PKG_EMOTOR.GET_CREDIT_INFO";
-            command.Parameters.AddRange(new OracleParameter[]
-            {
-                    P_CHASIS_NO,
-                    P_NUMBER
-            });
+            var ds = new Query.Execution(mvrsConnectionString).Execute_DataSet("SRNRPL.UpdateAuctionPaymentCompensation", sql);
 
-            DataSet dataSet = new DataSet("Results");
-            OracleDataAdapter oracleDataAdapter = new OracleDataAdapter(command);
-
-            if (command.Connection.State != ConnectionState.Open)
-            {
-                command.Connection.Open();
-            }
-
-            oracleDataAdapter.Fill(dataSet);
-
-            if (command.Connection.State == ConnectionState.Open)
-            {
-                command.Connection.Close();
-            }
-
-            return dataSet;
+            return ds;
         }
+        //public DataSet GetCreditFromMvrs(string oraConnectionString, string chassisNo)
+        //{
+        //    var P_CHASIS_NO = new OracleParameter("P_CHASIS_NO", OracleDbType.Varchar2, chassisNo, ParameterDirection.Input);
+        //    var P_NUMBER = new OracleParameter("P_NUMBER", OracleDbType.RefCursor, ParameterDirection.Output);
 
-        public void SaveCustomerPaymentToMvrs(Models.Views.Payment.Payee payee, string PSId, Int64 amountPaid)
+        //    var command = new OracleConnection(oraConnectionString).CreateCommand();
+        //    command.CommandType = System.Data.CommandType.StoredProcedure;
+        //    command.CommandText = $"MVRS.PKG_EMOTOR.GET_CREDIT_INFO";
+        //    command.Parameters.AddRange(new OracleParameter[]
+        //    {
+        //            P_CHASIS_NO,
+        //            P_NUMBER
+        //    });
+
+        //    DataSet dataSet = new DataSet("Results");
+        //    OracleDataAdapter oracleDataAdapter = new OracleDataAdapter(command);
+
+        //    if (command.Connection.State != ConnectionState.Open)
+        //    {
+        //        command.Connection.Open();
+        //    }
+
+        //    oracleDataAdapter.Fill(dataSet);
+
+        //    if (command.Connection.State == ConnectionState.Open)
+        //    {
+        //        command.Connection.Close();
+        //    }
+
+        //    return dataSet;
+        //}
+        public void SaveCustomerPaymentToMvrs(string mvrsConnectionString, Models.Views.Payment.Payee payee, string PSId, Int64 amountPaid)
         {
             try
             {
@@ -1261,7 +1326,7 @@ namespace DataAccess.Auction
                 sql[11] = new SqlParameter("@CreatedBy", 1);
 
 
-                var result = new Query.Execution(this.connectionString).Execute_Scaler("SRNRPL.SaveCustomerPaymentIntimation_EAuction", sql);
+                var result = new Query.Execution(mvrsConnectionString).Execute_Scaler("SRNRPL.SaveCustomerPaymentIntimation_EAuction", sql);
 
              
             }
