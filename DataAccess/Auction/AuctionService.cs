@@ -1322,7 +1322,7 @@ namespace DataAccess.Auction
                 sql[7] = new SqlParameter("@OwnerName", payee.OwnerName);
                 sql[8] = new SqlParameter("@CNIC", payee.CNIC);
                 sql[9] = new SqlParameter("@NTN", payee.NTN);
-                sql[10] = new SqlParameter("@PaymentStatusId", 1); //Status Marked as "Credit"
+                sql[10] = new SqlParameter("@PaymentStatusId", 3); //Status Marked as "Payment Recieved"
                 sql[11] = new SqlParameter("@CreatedBy", 1);
 
 
