@@ -7,9 +7,6 @@
       "sslPort": 0
     },
     "iisExpress": {
-      //"applicationUrl": "https://eauction-excise.punjab.gov.pk/",
-      //"applicationUrl": "http://103.226.216.162:8787/",
-      //"applicationUrl": "http://103.226.216.162/eauctionSecret/",
       "applicationUrl": "http://localhost:2000",
       "sslPort": 0
     }
